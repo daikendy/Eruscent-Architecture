@@ -1,226 +1,265 @@
 <div align="center">
 
-# ⚡ STRIVE — Public Architecture & System Design Specification
+# ⚡ ERUSCENT — Enterprise System Architecture & Public Specification
 
 **Institutional Peer Tutoring, Academic Telemetry & Enterprise Multi-Tenant Platform**
 
-Designed & Architected by **Eruscent**
+Designed & Engineered by **Eruscent**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time telemetry, asynchronous event handling, and an OWASP-hardened zero-trust security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, automated background maintenance, tamper-evident audit pipelines, and an OWASP-hardened security architecture.
 
-**[🚀 Live Demo](https://strive-chi-nine.vercel.app/)**
+**[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
 </div>
 
 ---
 
-## 📌 Executive Summary & Architecture Overview
+## 📌 1. Executive Summary & Enterprise System Architecture
 
-**STRIVE** is an institutional peer tutoring and academic telemetry platform architected by **Eruscent**. The platform acts as an intelligent intermediary between higher-education institutions (the platform operators) and their academic communities (students, tutors, department heads, and platform administrators).
+**ERUSCENT** is an institutional peer tutoring and academic telemetry platform designed to bridge higher-education institutions with their academic communities (students, tutors, department heads, and platform administrators).
 
-### Core Architectural Principles
+```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │                        ERUSCENT TENANT HUD                      │
+   │  ┌───────────────────────────────────────────────────────────┐  │
+   │  │                       UNIVERSITY                          │  │
+   │  └─────────────────────────────┬─────────────────────────────┘  │
+   │                                │                                │
+   │  ┌─────────────────────────────┴─────────────────────────────┐  │
+   │  │                         CAMPUS                            │  │
+   │  └─────────────────────────────┬─────────────────────────────┘  │
+   │                                │                                │
+   │  ┌─────────────────────────────┴─────────────────────────────┐  │
+   │  │                       DEPARTMENT                          │  │
+   │  └──────────────┬─────────────────────────────┬──────────────┘  │
+   │                 │                             │                 │
+   │  ┌──────────────┴───────────┐   ┌─────────────┴───────────┐     │
+   │  │    STUDENT PRINCIPAL     │   │     TUTOR PRINCIPAL     │     │
+   │  └──────────────────────────┘   └─────────────────────────┘     │
+   └─────────────────────────────────────────────────────────────────┘
+```
 
-1. **Strict Multi-Tenant Scoping**: Hierarchical tenant boundaries (`University` ➔ `Campus` ➔ `Department` ➔ `User`) enforced at both database and service layers with repository-level tenant queries.
+### Core Architectural Pillars
+
+1. **Hierarchical Multi-Tenancy**: Tenant boundaries (`University` ➔ `Campus` ➔ `Department` ➔ `User`) enforced at both database and service layers with repository-level tenant scoping.
 2. **Decoupled Identity & JIT Provisioning**: Authentication is offloaded to a stateless JWT/JWKS identity provider (Clerk) with Just-In-Time (JIT) user auto-provisioning and self-healing identity synchronization.
-3. **Event-Driven Asynchronous Processing**: Non-blocking background worker pools handle audit logging (`auditExecutor`), welcome emails, and webhook event consumption without blocking main HTTP request threads.
-4. **OWASP Top 10 Security Architecture**: Hardened against SQL Injection, XSS, Broken Access Control, Mass Assignment, and Rate Flooding (Bucket4j), backed by strict DTO encapsulation and `@PreAuthorize` role enforcement.
+3. **Automated Maintenance & Watchdog Engines**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance watchdog alerts.
+4. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
 5. **Zero-Trust Domain Gating**: Institutional registration is restricted in real time via a Super-Admin-managed, database-backed domain allowlist (e.g., `@dlsu.edu.ph`, `@admu.edu.ph`).
 
 ---
 
-## 🏗️ High-Level System Architecture Diagram
+## 🏗️ 2. High-Level System Architecture Diagram
 
 ```mermaid
 flowchart TB
     subgraph ClientLayer ["Client & Edge Layer (Next.js 16 App Router)"]
-        UI_Student["🎓 Student Dashboard"]
-        UI_Tutor["🧑‍🏫 Tutor Dashboard"]
-        UI_Admin["🛡️ Dept Admin Dashboard"]
+        UI_Student["🎓 Student Marketplace & Dashboard"]
+        UI_Tutor["🧑‍🏫 Tutor Management & Analytics"]
+        UI_Admin["🛡️ Department Admin Portal"]
         UI_Super["👑 Super Admin Telemetry HUD"]
-        Edge_CORS["🌐 Vercel Edge / CORS Guard"]
+        Edge_CORS["🌐 Edge Gateway / CORS Security Guard"]
     end
 
-    subgraph AuthLayer ["Identity & JWKS Layer"]
-        Clerk_IdP["🔐 Identity Provider (Clerk)"]
+    subgraph AuthLayer ["Identity & JWKS Provider"]
+        Clerk_IdP["🔐 Clerk Identity Provider"]
         JWKS_Uri["🔑 Public JWKS Keys Endpoint"]
     end
 
-    subgraph BackendLayer ["Application Layer — Spring Boot 3 Engine"]
+    subgraph BackendLayer ["Backend Core — Spring Boot 3 Engine"]
         Sec_Filter["🛡️ Spring Security Filter Chain"]
         Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"]
         Jwt_Decoder["jwtDecoder (NimbusJWKSet)"]
         JIT_Engine["🔄 JIT User Sync & Identity Healing"]
         
-        subgraph Controllers ["REST API Controllers"]
+        subgraph Controllers ["REST API Domain Controllers"]
             Ctrl_Auth["Auth & Domain Gating"]
-            Ctrl_Session["1:1 & Group Lobbies"]
+            Ctrl_Session["1:1 & Group Session Lobbies"]
             Ctrl_Analytics["Tutor & Dept Analytics"]
-            Ctrl_Admin["Super Admin & Telemetry"]
-            Ctrl_Webhook["Svix Webhook Consumer"]
+            Ctrl_Admin["Super Admin & Telemetry HUD"]
+            Ctrl_Webhook["Svix Webhook Listener"]
         end
 
-        subgraph AsyncPools ["Asynchronous Thread Pools"]
-            Audit_Pool["🪵 auditExecutor (Core: 2, Max: 5, Queue: 100)"]
-            Task_Pool["📧 taskExecutor (Core: 5, Max: 10, Queue: 500)"]
+        subgraph BackgroundWorkers ["Background Execution Engine"]
+            Audit_Pool["🪵 auditExecutor (2 Core / 5 Max / 100 Queue)"]
+            Task_Pool["📧 taskExecutor (5 Core / 10 Max / 500 Queue)"]
+            Nightly_Cron["⏰ DatabaseCleanupService (Daily @ 2:00 AM)"]
+            Ghost_Watchdog["🤖 GroupSessionScheduler (Hourly Radar)"]
         end
     end
 
-    subgraph DataLayer ["Data & Event Persistence"]
-        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
-        Media_Cloudinary["☁️ Cloudinary Media CDN"]
-        Mail_Provider["📨 SMTP / JavaMailSender"]
+    subgraph DataLayer ["Persistence & External Services"]
+        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Versioned Migrations)")]
+        Media_Cloudinary["☁️ Cloudinary Asset CDN"]
+        Mail_Provider["📨 SMTP / JavaMailSender (Mailtrap / Production Provider)"]
     end
 
     ClientLayer -->|HTTPS / Bearer JWT| Edge_CORS
     Edge_CORS --> Rate_Limiter
     Rate_Limiter --> Sec_Filter
     Sec_Filter --> Jwt_Decoder
-    Jwt_Decoder -.->|Fetch Public Keys| JWKS_Uri
+    Jwt_Decoder -.->|Stateless Public Key Fetch| JWKS_Uri
     Sec_Filter --> JIT_Engine
     JIT_Engine --> Controllers
 
-    Controllers -->|JPA / Hibernate| DB_Postgres
-    Controllers -->|Async Event| AsyncPools
-    Audit_Pool -->|Persist Logs| DB_Postgres
-    Task_Pool -->|Send Mail| Mail_Provider
-    Controllers -->|Asset Upload| Media_Cloudinary
+    Controllers -->|Spring Data JPA| DB_Postgres
+    Controllers -->|Async Events| BackgroundWorkers
+    Audit_Pool -->|Persist HMAC Signed Logs| DB_Postgres
+    Task_Pool -->|Send Transactional Emails| Mail_Provider
+    Nightly_Cron -->|Purge & Auto-Complete| DB_Postgres
+    Ghost_Watchdog -->|Low Attendance Alert| Mail_Provider
+    Controllers -->|Profile Image Uploads| Media_Cloudinary
     Clerk_IdP -->|Svix Signed Webhooks| Ctrl_Webhook
 ```
 
 ---
 
-## 🧠 AI Prompt Engineering & Guardrail Pipeline
+## 🔐 3. Decoupled Identity, JWKS & JIT User Provisioning
 
-Although Strive operates primarily as a transactional academic engine, all data ingestion and state transitions pass through strict anti-hallucination and validation guardrails to ensure structural integrity across system boundaries.
+Eruscent decouples identity authentication from application authorization by leveraging stateless JWT tokens verified against remote JWKS public keys.
 
 ```
-Incoming Request Payload
+Incoming Request (Bearer JWT)
          │
          ▼
-[ Jakarta Bean Validation Guard (@Valid, @NotNull, @Pattern) ]
+[ JwtDecoder (NimbusJwtDecoder with JwkSetUri) ]
          │
          ▼
-[ Jackson ObjectMapper Strict Schema Verification (Deserialization) ]
+[ Extract Clerk Principal ID (jwt.getSubject()) ]
          │
-         ▼
-[ Spring Security @PreAuthorize RBAC Scoping ]
-         │
-         ▼
-[ Zod Client-Side Contract Enforcement (Next.js Layer) ]
-         │
-         ▼
-[ OpenAPI 3.0 Immutable Route Schema Validation ]
+         ├──► [ User Found in DB ] ────► Identity Healing (Sync Name & Profile Picture)
+         │                                       │
+         └──► [ User Not Found ] ────► Just-In-Time (JIT) Auto-Provisioning
+                                                 │
+                                                 ▼
+                             [ Map Granted Authorities & Dual Roles ]
+                             (ROLE_STUDENT, ROLE_TUTOR, ROLE_ADMIN)
 ```
 
-### Key Guardrail Mechanisms
+### Identity Architecture Features
 
-* **Jakarta Bean Validation**: Every incoming DTO is validated at the REST controller boundary using `@Valid`. Any structural violation immediately throws a `MethodArgumentNotValidException` trapped by the `GlobalExceptionHandler`.
-* **Zero Mass-Assignment (Strict DTOs)**: Internal database JPA entities are never exposed or accepted directly via API contracts. Request payloads map exclusively to explicit Java records/DTOs.
-* **Strict Jackson Deserialization**: Configured with `FAIL_ON_UNKNOWN_PROPERTIES` to reject unexpected parameters, preventing over-posting attacks.
-* **Zod Schema Matching**: Frontend forms share identical structural schemas compiled with Zod, guaranteeing that malformed inputs never penetrate the network boundary.
+* **Stateless Token Verification**: Authentication overhead is minimized by verifying incoming JWT signatures against cached JWKS endpoints (`spring.security.oauth2.resourceserver.jwt.jwk-set-uri`).
+* **Just-In-Time (JIT) Provisioning**: If a user authenticates via Clerk but does not yet exist in the local PostgreSQL database, `userService.createEmptyUserFromClerk()` auto-provisions their initial account context.
+* **Identity Self-Healing**: On each request, if a user's full name or profile picture URL in the JWT claims differs from the database record, the backend automatically updates and heals the local entity.
+* **Dual Role Aggregation**: Supports multi-role principals (e.g., a student who is also an approved tutor) by mapping all active roles into the Spring Security Context (`CustomJwtAuthenticationToken`).
 
 ---
 
-## 💳 Enterprise Asynchronous Event & Billing Architecture
+## ⚡ 4. High-Concurrency Asynchronous & Scheduled Engine
 
-Strive utilizes an asynchronous, signature-verified webhook architecture powered by **Svix** (`com.svix:svix`) to consume external lifecycle events, manage user provisioning, and prepare the system for enterprise subscription billing integrations.
+Eruscent combines dedicated thread pools with automated background schedulers to guarantee high throughput and clean data maintenance.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant IdP as Identity / Billing Event Source
-    participant Svix as Svix Webhook Gateway
-    participant Ctrl as ClerkWebhookController
-    participant Sec as Svix Webhook Verifier
-    participant Pool as taskExecutor Thread Pool
-    participant DB as PostgreSQL 16
-
-    IdP->>Svix: Trigger Event (user.created / subscription.updated)
-    Svix->>Ctrl: POST /api/v1/webhooks/clerk<br/>(Headers: svix-id, svix-timestamp, svix-signature)
-    Ctrl->>Sec: Webhook.verify(payload, headers)
-    alt Invalid Signature
-        Sec-->>Ctrl: WebhookVerificationException
-        Ctrl-->>Svix: 400 Bad Request (Invalid Signature)
-    else Signature Verified
-        Sec-->>Ctrl: Verification Success
-        Ctrl->>DB: Upsert User / Sync Tenant State
-        Ctrl->>Pool: Dispatch Async Event (e.g. Welcome Email / Billing Sync)
-        Pool-->>DB: Log Audit Event (AuditLog)
-        Ctrl-->>Svix: 200 OK (Webhook Processed)
-    end
+```
+                        ┌──────────────────────────────────────────┐
+                        │      SPRING @ENABLEASYNC THREAD POOLS    │
+                        └────────────────────┬─────────────────────┘
+                                             │
+                       ┌─────────────────────┴─────────────────────┐
+                       ▼                                           ▼
+          [ auditExecutor Thread Pool ]               [ taskExecutor Thread Pool ]
+          • Core Threads: 2                           • Core Threads: 5
+          • Max Threads: 5                            • Max Threads: 10
+          • Queue Capacity: 100                       • Queue Capacity: 500
+          • Isolates HMAC Audit Logging               • Handles Email Notifications
 ```
 
-### Event Processing Controls
+### Automated Background Schedulers
 
-1. **Cryptographic Signature Verification**: HMAC-SHA256 signature validation via Svix headers prevents spoofing.
-2. **Idempotent State Sync**: Webhook handlers check unique identifiers (`clerkId`, event timestamps) to safely retry without duplicate processing.
-3. **Decoupled Execution**: Long-running side effects (welcome email dispatch, telemetry logging) are offloaded to dedicated thread pools (`taskExecutor`).
+1. **Nightly Database Maintenance (`DatabaseCleanupService`)**:
+   * Runs daily at 2:00 AM (`@Scheduled(cron = "0 0 2 * * *")`).
+   * **Slot Purging**: Deletes all past, unbooked `TimeSlot` entities.
+   * **1:1 Session Auto-Completion**: Transitions past confirmed 1-on-1 tutoring sessions to `COMPLETED` after a 24-hour grace period.
+   * **Group Session Auto-Completion**: Completes populated group classes 24 hours post-schedule.
+   * **Empty Group Cancellation**: Cancels unpopulated group sessions automatically.
+   * **Audit Log Retention Pruning**: Deletes audit logs older than 365 days.
+2. **Pending Session Auto-Expiry**:
+   * Runs every 15 minutes (`@Scheduled(cron = "0 0/15 * * * *")`).
+   * Auto-expires pending session requests that tutors failed to accept or reject before their scheduled start time.
+3. **Ghost-Town Low Attendance Watchdog (`GroupSessionScheduler`)**:
+   * Runs hourly (`@Scheduled(cron = "0 0 * * * *")`).
+   * Scans for group sessions starting in the next 12 hours with fewer than 3 enrolled students.
+   * Dispatches warning emails to tutors so they can decide whether to proceed or cancel.
 
 ---
 
-## 🔒 Enterprise Privacy, GDPR Scrubbing & IDOR Isolation
+## 🔒 5. OWASP-Hardened Security & Cryptographic Audit Pipeline
 
-Strive implements strict data protection, Insecure Direct Object Reference (IDOR) defense, and privacy-first data scrubbing routines.
+Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities.
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
-       │                   AUTHENTICATED PRINCIPAL                   │
+       │                   AUDIT EVENT GENERATED                     │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
                                       ▼
        ┌─────────────────────────────────────────────────────────────┐
-       │     Repository-Level Ownership & Tenant Context Query       │
-       │  SELECT s FROM TutoringSession s WHERE s.id = :id           │
-       │  AND (s.student.id = :userId OR s.tutor.user.id = :userId)   │
+       │              1. PII & Secret Scrubbing                      │
+       │     (Redacts Passwords, Tokens, API Keys, and Emails)       │
        └──────────────────────────────┬──────────────────────────────┘
                                       │
-                 ┌────────────────────┴────────────────────┐
-                 ▼                                         ▼
-       [ Access Granted ]                      [ Access Denied (403) ]
-                 │                                         │
-        Execute Operation                         IDOR Blocked & Logged
+                                      ▼
+       ┌─────────────────────────────────────────────────────────────┐
+       │         2. Log Forging & XSS Sanitization                   │
+       │     (CRLF Removal & HTML Escaping via HtmlUtils)            │
+       └──────────────────────────────┬──────────────────────────────┘
+                                      │
+                                      ▼
+       ┌─────────────────────────────────────────────────────────────┐
+       │      3. HMAC-SHA256 Cryptographic Signature Generation      │
+       │     sign(userId, action, details, timestamp, auditSecret)   │
+       └──────────────────────────────┬──────────────────────────────┘
+                                      │
+                                      ▼
+       ┌─────────────────────────────────────────────────────────────┐
+       │         4. Asynchronous Database Persistence                │
+       └─────────────────────────────────────────────────────────────┘
 ```
 
-### Data Protection Controls
+### Security Engineering Controls
 
-* **IDOR Isolation via Repository Owner Queries**: Access to sensitive entities (`TutoringSession`, `TimeSlot`, `Review`) is scoped to the requesting user's principal ID at the database query level. Users cannot access or mutate resources belonging to another user.
-* **Cascade Deletion (`user.deleted`)**: When a user deletion event is consumed, `UserService.deleteUserByClerkId()` performs cascading purges of associated profile data, availability slots, and session enrollments.
-* **PII Log Scrubbing**: Structured logging configurations explicitly exclude sensitive parameters (passwords, JWT tokens, personal emails) from log outputs.
-* **Role-Based Access Control (RBAC)**: Fine-grained `@PreAuthorize("hasRole('ADMIN')")` and `@PreAuthorize("hasRole('SUPER_ADMIN')")` annotations enforce strict operational boundaries.
+* **Tamper-Evident Digital Signatures**: Every audit record saved via `AuditEventListener` contains an `HMAC-SHA256` signature computed over `userId|action|details|timestamp` using an immutable server key.
+* **PII & Credential Scrubbing**: `AuditSecurityUtils` applies regex masking to strip passwords, secret keys, bearer tokens, and email addresses prior to log persistence.
+* **Insecure Direct Object Reference (IDOR) Isolation**: Database queries for session management, time slots, and reviews enforce principal ownership checks (`WHERE s.student.id = :userId OR s.tutor.user.id = :userId`).
+* **Security Response Headers**:
+  * `Strict-Transport-Security` (HSTS): `max-age=31536000; includeSubDomains`
+  * `X-Frame-Options`: `DENY`
+  * `Referrer-Policy`: `strict-origin-when-cross-origin`
+* **Zero Mass Assignment**: Incoming request payloads map exclusively to validated DTOs, prohibiting client-side entity field tampering.
 
 ---
 
-## 🎯 Feature Capability & System Architecture Mapping
+## 🎯 6. Feature Capability & System Architecture Mapping
 
-| Feature Domain | Capability Description | Architectural Layer | Primary Security & Operational Controls |
+| Feature Capability | Functional Description | Architecture Component | Primary Security & Operational Control |
 |---|---|---|---|
-| **Auth & Onboarding** | Domain-gated registration, Clerk JWKS integration, JIT user creation | Spring Security + Clerk | `AllowedEmailDomain` allowlist, HMAC JWKS validation |
-| **1:1 Session Engine** | Student-to-tutor session booking, calendar scheduling, booking state machine | Backend Controller + JPA Repositories | Owner-scoped queries, `@PreAuthorize("hasRole('STUDENT')")` |
-| **Group Session Lobbies**| Multi-student group lobby creation, capacity auto-tracking, auto-enrollment | `GroupSession` & `Enrollment` Entities | Synchronized enrollment checks, capacity constraints |
-| **Tutor Analytics** | 7-day earnings yield, student retention rate, daily performance metrics | `TutorAnalyticsController` + Recharts | DTO projection, read-only analytical SQL queries |
-| **Dept Admin Portal** | Tutor approval workflows, 30-day KPI historical snapshots, bottleneck tracking | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
-| **Super Admin HUD** | Global multi-tenant administration, system heatmaps, dynamic domain allowlist | `SuperAdminController` + `SuperAdminTelemetryController` | Platform-wide RBAC, zero-downtime allowlist update |
-| **Media Management** | Profile avatar uploads, asset hosting | Cloudinary API + Spring Web | File extension validation, size limits, Rate Limit Profile |
+| **Domain-Gated Signup** | Restricts student registration to verified university email domains | `EmailDomainController` & `AllowedEmailDomain` | Super Admin managed, real-time DB allowlist check |
+| **Tutor Marketplace** | Searchable directory by subject, campus, hourly rate, and rating | `TutorProfileController` & JPA Specifications | Public GET cache, active profile filtering |
+| **1:1 Session Engine** | Real-time booking calendar, time slot locks, session state machine | `TutoringSessionService` | IDOR owner isolation, pending auto-expiry |
+| **Group Session Lobbies**| Multi-student group sessions, capacity bounds, automated enrollment | `GroupSessionService` & `Enrollment` | Capacity checks, hourly low-attendance watchdog |
+| **Tutor Analytics** | 7-day earnings yield, retention rate, daily yield analytics | `TutorAnalyticsController` | Custom SQL DTO projections, read-only isolation |
+| **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
+| **Super Admin HUD** | Platform-wide telemetry, system anomalies, domain allowlist manager | `SuperAdminController` & `SuperAdminTelemetryController` | Platform RBAC, zero-downtime allowlist updates |
+| **Media Management** | Profile picture avatar uploads & CDN asset delivery | Cloudinary Service | Multipart size checks, rate-limited upload profile |
 
 ---
 
-## 📊 Entity-Relationship & Data Model Overview
+## 📊 7. Entity-Relationship & Data Model Overview
 
 ```mermaid
 erDiagram
     UNIVERSITY ||--|{ CAMPUS : contains
     CAMPUS ||--|{ DEPARTMENT : contains
-    DEPARTMENT ||--|{ USER : belongs_to
+    DEPARTMENT ||--|{ USER : employs_or_enrolls
     USER ||--o| TUTOR_PROFILE : presents
-    USER ||--o{ TUTORING_SESSION : requests_as_student
+    USER ||--o{ TUTORING_SESSION : books_as_student
     TUTOR_PROFILE ||--o{ TUTORING_SESSION : conducts_as_tutor
     TUTOR_PROFILE ||--o{ TIME_SLOT : publishes
     TUTOR_PROFILE ||--o{ GROUP_SESSION : hosts
@@ -267,7 +306,16 @@ erDiagram
         string title
         integer max_capacity
         integer current_capacity
+        boolean low_attendance_warning_sent
         enum status
+    }
+
+    AUDIT_LOG {
+        bigint id PK
+        string action
+        string details
+        string digital_signature
+        timestamp created_at
     }
 
     ALLOWED_EMAIL_DOMAIN {
@@ -275,71 +323,37 @@ erDiagram
         string domain UK
         boolean is_active
     }
-
-    AUDIT_LOG {
-        bigint id PK
-        string action
-        string performed_by
-        string ip_address
-        timestamp timestamp
-    }
 ```
 
 ---
 
-## ⚡ Performance & High-Concurrency Design
+## 🛡️ 8. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
 
-Strive is engineered for low latency and high concurrency under peak enrollment periods:
+Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 
-```
-[ Incoming Requests ]
-         │
-         ├──► [ HTTP Request Thread ] ──► Fast JwtDecoder (JWKS Cached in Memory)
-         │                                       │
-         │                                       ▼
-         │                             [ Fast DB Query via HikariCP ]
-         │                                       │
-         └──► [ Async Operations ] ──────────────┴──► [ ThreadPoolTaskExecutor ]
-                                                          ├── auditExecutor (2-5 Threads)
-                                                          └── taskExecutor (5-10 Threads)
-```
-
-1. **Decoupled JWKS Token Verification**: JWT verification is performed statelessly in-memory using Nimbus JWKS public keys, eliminating round-trips to the identity provider on hot API paths.
-2. **Dedicated Asynchronous Thread Pools**:
-   * `auditExecutor`: Core 2, Max 5 threads, 100 queue capacity (isolates audit persistence).
-   * `taskExecutor`: Core 5, Max 10 threads, 500 queue capacity (handles email notification dispatch).
-3. **Database Connection Pooling**: HikariCP connection pool with optimized size parameters and Flyway migration controls.
-4. **Client-Side Query Caching**: Next.js React Query handles optimistic UI updates, deduplication, and stale-while-revalidate caching.
-
----
-
-## 🛡️ Rate Limiting & DoS Protection Matrix
-
-Rate limiting is enforced at the backend gateway via `RateLimitInterceptor` using **Bucket4j**:
-
-| Profile Name | URI Pattern / Target Endpoints | Rate Limit Policy | Bucket Strategy | Action on Exceeded |
+| Rate Limit Profile | URI Patterns / Protected Endpoints | Allowance Threshold | Bucket Refill Strategy | Action on Overflow |
 |---|---|---|---|---|
-| **Auth & Upload Profile** | `/api/v1/auth/**`, `/api/v1/users/login`, `/api/v1/users/register`, `/upload` | **5 requests / minute** | Per IP Token Bucket | HTTP 429 Too Many Requests |
-| **Public Contact Profile** | `/api/v1/public/contact` | **2 requests / hour** | Per IP Token Bucket | HTTP 429 Too Many Requests |
-| **Standard Mutation Profile**| All state-changing mutations (`POST`, `PUT`, `DELETE`, `PATCH`) | **60 requests / minute** | Per IP Token Bucket | HTTP 429 Too Many Requests |
-| **Read Bypass** | `GET` and `OPTIONS` requests | **Unlimited / Unthrottled** | Bypass Rule | HTTP 200 OK |
+| **Auth & Upload Profile** | `/api/v1/auth/**`, `/api/v1/users/login`, `/api/v1/users/register`, `/upload` | **5 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
+| **Public Contact Profile** | `/api/v1/public/contact` | **2 requests / hour** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
+| **State Mutation Profile** | All state-modifying requests (`POST`, `PUT`, `DELETE`, `PATCH`) | **60 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
+| **Read Bypass** | All `GET` and `OPTIONS` pre-flight requests | **Unlimited / Unthrottled** | Bypass Rule | Allowed |
 
-### IP Extraction Security
+### Reverse-Proxy Aware IP Extraction
 
-To prevent rate-limit bypass via header spoofing, `RateLimitInterceptor` extracts the **last IP address** in the `X-Forwarded-For` header chain (the address appended by the trusted reverse proxy) rather than trusting the first user-supplied entry.
+To prevent IP spoofing attacks via client-supplied headers, `RateLimitInterceptor` parses the `X-Forwarded-For` header chain and extracts the **last IP address** (the address appended by trusted reverse proxies such as Railway/Cloudflare) rather than trusting client-injected positions.
 
 ---
 
-## 🪵 Production Structured Telemetry & Observability Pipeline
+## 🪵 9. Production Structured Telemetry & Observability Pipeline
 
-Strive includes structured logging, health checks, and audit logging out of the box:
+Eruscent includes structured telemetry and observability out of the box:
 
 ```json
 {
-  "timestamp": "2026-08-08T23:15:00.123Z",
+  "timestamp": "2026-08-08T23:15:50.000Z",
   "level": "INFO",
   "logger": "com.strive.backend.config.SecurityConfig",
-  "thread": "http-nio-8080-exec-3",
+  "thread": "http-nio-8080-exec-1",
   "message": "SECURITY TELEMETRY",
   "context": {
     "clerkId": "user_2tX9kL...7mP",
@@ -352,120 +366,100 @@ Strive includes structured logging, health checks, and audit logging out of the 
 
 ### Observability Features
 
-* **Spring Boot Actuator**: Health, metrics, and application readiness probes exposed at `/actuator/health`.
-* **Structured ISO-8601 Logs**: Logback output formatted in machine-readable JSON for seamless log aggregation (Datadog, AWS CloudWatch, ELK).
-* **Persistent Audit Logging**: Crucial security and administrative actions are asynchronously recorded in the `AuditLog` database table.
+* **Health Probes**: Spring Boot Actuator health and readiness endpoints configured at `/actuator/health`.
+* **Structured Log Formatting**: SLF4J and Logback configured for structured ISO-8601 JSON log aggregation.
+* **Department KPI Historical Snapshots**: 30-day historical analytics tracking session completion rates, student retention, and departmental subject bottlenecks.
 
 ---
 
-## 🏛️ Master Vault & Snapshot State Engine
+## 📱 10. Responsive Frontend & Mobile Layout Architecture
 
-Strive maintains historical trend telemetry and departmental analytics snapshots to provide institutional leaders with data-driven insights:
+The frontend client layer is built with a modern, high-performance web architecture:
 
-```
-[ Live Session Data ] ──► [ Aggregation Engine ] ──► [ Department Analytics Snapshot ]
-                                                             │
-                                                             ▼
-                                                [ Super Admin Telemetry HUD ]
-                                                • 30-Day KPI History
-                                                • Department Bottlenecks
-                                                • 7-Day Tutor Earnings Yield
-```
-
-* **Department KPI Snapshots**: 30-day historical trend analysis covering session completion rates, tutor response times, and subject bottlenecks.
-* **Tutor Yield Analytics**: Real-time earnings trend, retention rate, and yield calculation per tutor profile.
-* **Platform Heatmaps**: Super Admin visual telemetry displaying system activity and registration volume across institutional campuses.
+* **Framework**: Next.js 16 (App Router) with React 19 and TypeScript 5.
+* **Styling System**: Tailwind CSS v4 with dynamic dark mode (`next-themes`) and Radix UI primitives.
+* **Visual FX & Icons**: Lucide React icons, Framer Motion animations, and Canvas Confetti feedback.
+* **State Management**: TanStack React Query (`v5`) handling API caching, optimistic UI updates, and stale-while-revalidate policies.
 
 ---
 
-## 📱 Cross-Platform & Mobile Architecture
+## 🛠️ 11. Technology Stack Breakdown
 
-The frontend is built mobile-first using responsive web paradigms:
-
-* **Framework**: Next.js 16 (App Router) with React 19.
-* **Styling & Layout**: Tailwind CSS v4 with dynamic viewport scaling.
-* **Iconography & Visuals**: Lucide React icons with Framer Motion animations.
-* **Mobile & Cross-Platform Readiness**: Fully structured for web, tablet, and mobile browsers, with a layout architecture optimized for PWA or Capacitor native packaging.
-
----
-
-## 🛠️ Technology Stack Breakdown
-
-| Architectural Layer | Technology Selected | Version | Purpose & Responsibilities |
+| Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
-| **Frontend Framework** | Next.js (App Router) | `16.1.6` | Client dashboard rendering, SSR, route handlers |
-| **Frontend UI Library** | React | `19.2.3` | UI component tree management |
-| **Styling Engine** | Tailwind CSS | `v4` | Design system, responsive layouts |
-| **State & Data Fetching** | TanStack React Query | `v5` | Client-side API caching, state management |
-| **Schema Validation** | Zod | `v4` | Form and API payload validation (Client) |
-| **Backend Framework** | Spring Boot | `3.4.2` | Core REST API engine & business logic |
-| **Language Runtime** | Java OpenJDK | `21` | High-performance backend execution environment |
-| **Security Framework** | Spring Security | `3.4.2` | Stateless authentication, `@PreAuthorize` RBAC |
-| **Identity Provider** | Clerk | `@clerk/nextjs` | Authentication, user identity management |
-| **Webhook Signature Guard**| Svix | `1.90.0` | Secure webhook HMAC verification |
-| **Rate Limiting Engine** | Bucket4j | `8.10.1` | Per-IP token bucket DoS protection |
-| **Database** | PostgreSQL | `16` | Relational data store |
-| **DB Migration Tool** | Flyway | Built-in | Schema versioning and automated migrations |
-| **Asset CDN** | Cloudinary | API v2 | Profile avatar & media asset storage |
-| **Email Dispatch** | JavaMailSender / Mailtrap | Spring Starter | Asynchronous transactional notification emails |
+| **Frontend Core** | Next.js (App Router) | `16.1.6` | Client dashboard UI, SSR, layout routing |
+| **UI Library** | React | `19.2.3` | Reactive component rendering |
+| **Styling** | Tailwind CSS | `v4` | Design tokens, responsive utility classes |
+| **Data Fetching** | TanStack React Query | `v5.90.21` | Client-side API query caching & mutation |
+| **Validation (Client)**| Zod | `v4.3.6` | Frontend form & contract validation |
+| **Backend Core** | Spring Boot | `3.4.2` | Enterprise REST API engine |
+| **Runtime** | Java OpenJDK | `21` | High-performance backend execution |
+| **Security** | Spring Security | `3.4.2` | OAuth2 Resource Server & `@PreAuthorize` RBAC |
+| **Identity Provider** | Clerk | `@clerk/nextjs` | Authentication & token issuance |
+| **Webhook Verifier** | Svix | `1.90.0` | Cryptographic HMAC webhook verification |
+| **Rate Limiter** | Bucket4j | `8.10.1` | Per-IP token bucket rate limiting |
+| **Database** | PostgreSQL | `16` | Relational data persistence |
+| **Migrations** | Flyway | Built-in | Database versioning & automated migrations |
+| **Media CDN** | Cloudinary | API v2 | Profile avatar & media asset storage |
+| **Email Service** | JavaMailSender | Spring Starter | Asynchronous transactional notification mail |
 
 ---
 
-## 🗺️ High-Level API Domain Map
+## 🗺️ 12. High-Level API Domain Map
 
-All backend endpoints are scoped under the `/api/v1` namespace:
+All API endpoints are exposed under the `/api/v1` namespace:
 
-| Group | Base Path | Required Role / Access | Default Rate Limit Profile | Purpose |
+| Group | Base Path | Required Access / Role | Rate Limit Profile | Purpose |
 |---|---|---|---|---|
-| **Auth** | `/api/v1/auth/**` | Public / Authenticated | Auth Profile (5 req/min) | Identity sync & session context |
-| **Users** | `/api/v1/users/**` | Authenticated / Self | Auth Profile (for sensitive endpoints) | Profile management & password updates |
-| **Sessions (1:1)** | `/api/v1/sessions/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | 1-on-1 tutoring booking state machine |
-| **Group Lobbies** | `/api/v1/lobbies/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | Group session lobbies & auto-enrollment |
-| **Availability** | `/api/v1/timeslots/**` | `ROLE_TUTOR` | Standard Profile (60 req/min) | Tutor calendar availability slots |
-| **Tutor Profiles** | `/api/v1/profiles/**` | Public / Authenticated | Read Bypass (GET) | Public tutor directory & profile details |
-| **Dashboard** | `/api/v1/dashboards/**` | Student, Tutor, Admin | Standard Profile (60 req/min) | Role-specific dashboard aggregations |
+| **Auth** | `/api/v1/auth/**` | Public / Authenticated | Auth Profile (5 req/min) | Identity synchronization & session context |
+| **Users** | `/api/v1/users/**` | Authenticated / Self | Auth Profile (sensitive routes) | User profiles & avatar updates |
+| **Sessions (1:1)** | `/api/v1/sessions/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | 1-on-1 session booking state machine |
+| **Group Lobbies** | `/api/v1/lobbies/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | Group session creation & auto-enrollment |
+| **Availability** | `/api/v1/timeslots/**` | `ROLE_TUTOR` | Standard Profile (60 req/min) | Tutor calendar time slot publishing |
+| **Tutor Profiles** | `/api/v1/profiles/**` | Public / Authenticated | Read Bypass (GET) | Public tutor directory search |
+| **Dashboard** | `/api/v1/dashboards/**` | Student, Tutor, Admin | Standard Profile (60 req/min) | Role-based aggregate dashboards |
 | **Analytics** | `/api/v1/tutor/analytics` | `ROLE_TUTOR` | Standard Profile (60 req/min) | Tutor earnings yield & retention analytics |
-| **Admin** | `/api/v1/admin/**` | `ROLE_ADMIN` | Standard Profile (60 req/min) | Departmental tutor verification & KPIs |
-| **Super Admin** | `/api/v1/super/**` | `ROLE_SUPER_ADMIN` | Standard Profile (60 req/min) | Multi-tenant setup & domain allowlist |
-| **Universities** | `/api/v1/universities/**` | Public | Read Bypass (GET) | Institutional structure lookup |
+| **Admin** | `/api/v1/admin/**` | `ROLE_ADMIN` | Standard Profile (60 req/min) | Tutor approval & department KPIs |
+| **Super Admin** | `/api/v1/super/**` | `ROLE_SUPER_ADMIN` | Standard Profile (60 req/min) | Platform administration & domain allowlist |
+| **Universities** | `/api/v1/universities/**` | Public | Read Bypass (GET) | Institutional campus lookup |
 
 ---
 
-## 💡 Architecture Strategy: Public Spec & Private Implementation
+## 💡 13. Architecture Strategy: Public Spec & Private Implementation
 
-Architected by **Eruscent**, this project follows an **"Open Specification, Closed Source Implementation"** design strategy.
+Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
 ```
        ┌─────────────────────────────────────────────────────────────────┐
        │                PUBLIC SPECIFICATION REPOSITORY                  │
        │                   (GitHub: Public Repository)                   │
-       │  • Architecture Blueprints & Mermaid Flowcharts                 │
-       │  • API Domain Contracts & Route Specifications                  │
+       │  • Architectural Blueprints & System Design Flowcharts          │
+       │  • OpenAPI 3.0 Route Contracts & Domain Mapping                 │
        │  • Entity-Relationship Diagrams (ERD)                           │
-       │  • Security Control Matrices & Rate Limiting Rules             │
+       │  • Security Audit Controls & Rate Limiting Matrices             │
        └────────────────────────────────┬────────────────────────────────┘
                                         │
                                         ▼
        ┌─────────────────────────────────────────────────────────────────┐
        │             PRIVATE IMPLEMENTATION SOURCE CODE BASE             │
        │                  (GitHub: Private Repository)                   │
-       │  • Full Java 21 / Spring Boot 3 Source Code                     │
+       │  • Proprietary Java 21 / Spring Boot 3 Engine                   │
        │  • Next.js 16 App Router Codebase                               │
-       │  • Database Schema & Production Credentials                     │
+       │  • Production Database Migrations & Environment Credentials     │
        └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Strategic Benefits
 
-1. **Intellectual Property Protection**: The proprietary backend algorithms, database schema implementations, and business logic remain strictly confidential in private repositories.
-2. **Public System Design Showcase**: Prospective clients, auditors, and technical stakeholders can inspect Eruscent's software architecture, security practices, and enterprise capabilities without exposing vulnerability vectors.
-3. **Open Contract Standards**: Allows frontend and backend teams or integration partners to build against clear interface contracts (`OpenAPI 3.0`, `TypeScript interfaces`) without needing direct access to private repositories.
+1. **Intellectual Property Protection**: Proprietary business logic, database migrations, and backend code stay protected in private repositories.
+2. **Public System Design Showcase**: Technical stakeholders and potential enterprise clients can inspect **Eruscent's** software architecture, security practices, and engineering standards.
+3. **Clean Contract Interfaces**: Integration partners and frontend developers can build against explicit interface specs without needing access to underlying private repositories.
 
 ---
 
 <div align="center">
 
-**Created & Maintained by Eruscent**  
+**Designed & Architected by Eruscent**  
 *Building Secure, Scalable, and Modern Enterprise Systems.*
 
 </div>
