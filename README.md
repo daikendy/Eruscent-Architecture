@@ -13,10 +13,11 @@ Designed & Engineered by **Eruscent**
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Flyway Migrations](https://img.shields.io/badge/Flyway-PostgreSQL_v16-CC0200?style=for-the-badge&logo=flyway&logoColor=white)](https://flywaydb.org/)
+[![GitHub Actions CI/CD](https://img.shields.io/badge/GitHub_Actions-CI%2FCD_Pipeline-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black)](https://swagger.io/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, dynamic JPA Criteria specifications, zero-trust peer messaging, verified review aggregation, in-memory query caching, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, and an OWASP-hardened security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, dynamic JPA Criteria specifications, zero-trust peer messaging, verified review aggregation, in-memory query caching, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, automated containerized CI/CD testing, and an OWASP-hardened security architecture.
 
 **[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
@@ -66,8 +67,9 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 9. **Optimistic Concurrency Control**: JPA optimistic locking (`ObjectOptimisticLockingFailureException`) prevents race conditions during high-volume simultaneous bookings.
 10. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
 11. **Resilient Client Interceptor**: Next.js client-side Axios layer featuring automatic exponential backoff retries for transient HTTP errors (502-504, 429, timeouts).
-12. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
-13. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
+12. **Automated CI/CD & Security Workflows**: GitHub Actions integration pipelines featuring live PostgreSQL 16 service containers and automated weekly security dependency audits.
+13. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
+14. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
 
 ---
 
@@ -127,6 +129,11 @@ flowchart TB
         end
     end
 
+    subgraph DevOpsLayer ["DevOps & Automated CI/CD"]
+        GHA_CI["🛠️ GitHub Actions (Java 21 + Live Postgres 16 Container)"]
+        GHA_Audit["🛡️ Weekly Dependency Security Audit Cron"]
+    end
+
     subgraph DataLayer ["Persistence & External Services"]
         DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
         Mail_Provider["📨 SMTP / JavaMailSender (Mailtrap / Production Provider)"]
@@ -151,6 +158,9 @@ flowchart TB
     Nightly_Cron -->|Purge & Auto-Complete| DB_Postgres
     Ghost_Watchdog -->|Low Attendance Alert| Mail_Provider
     Clerk_IdP -->|Svix Signed Webhooks| Ctrl_Webhook
+
+    GHA_CI -.->|Automated Integration Build| BackendLayer
+    GHA_Audit -.->|Automated Vulnerability Scanner| ClientLayer
 ```
 
 ---
@@ -571,6 +581,7 @@ Configured with `JavaTimeModule` and `WRITE_DATES_AS_TIMESTAMPS = false` to guar
 | **Gamification Engine** | Timezone-aware streak tracking for active students and tutors | `GroupSessionService` & `UserService` | User timezone validation, streak boundary math |
 | **In-Memory Caching** | Spring `@Cacheable` optimization for telemetry and heatmaps | `SuperAdminTelemetryService` | Cache key eviction, zero DB reload latency |
 | **Interactive API Docs**| Self-documenting Swagger UI & OpenAPI 3.0 specification | `springdoc-openapi` & `SwaggerConfig` | Bearer JWT security scheme definition |
+| **Automated CI/CD** | Live PostgreSQL 16 container integration builds & weekly audits | GitHub Actions (`ci.yml` & `security-audit.yml`) | PR build checks, `npm audit` & Maven verification |
 | **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
 | **Super Admin HUD** | Platform-wide telemetry, system anomalies, domain allowlist manager | `SuperAdminController` & `SuperAdminTelemetryController` | Platform RBAC, zero-downtime allowlist updates |
 
@@ -823,7 +834,29 @@ Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)
 
 ---
 
-## 🏗️ 23. Environment Profile Isolation & Production Tiering
+## 🛠️ 23. Automated CI/CD Pipeline & Full-Stack DevOps Architecture
+
+Eruscent uses an automated, containerized **GitHub Actions** CI/CD testing and vulnerability auditing pipeline (`.github/workflows/`):
+
+```
+Pull Request / Push to Main Branch
+         │
+         ├─────────────────────────────────────────┐
+         ▼                                         ▼
+[ Java CI Workflow (ci.yml) ]            [ Security Audit Workflow (security-audit.yml) ]
+• Spins up PostgreSQL 16 Service Container • Runs npm audit --audit-level=high (Frontend)
+• Health Probes (pg_isready)               • Runs mvn clean verify (Backend)
+• Compiles Java 21 & Runs Unit Tests       • Scheduled Weekly Midnight Audits (Cron: 0 0 * * 0)
+```
+
+### DevOps Features
+
+* **Live Containerized Integration Testing**: The CI workflow (`ci.yml`) spins up a real, ephemeral `postgres:16` container service inside GitHub Actions with automated health checks (`pg_isready`), verifying schema compilation and database queries against a live database instance before merging code.
+* **Automated Weekly Security Audits**: The security workflow (`security-audit.yml`) runs on PRs, pushes, and **weekly scheduled crons** (every Sunday at midnight), auditing Node.js dependencies (`npm audit`) and Java Maven artifacts for newly discovered CVE vulnerabilities.
+
+---
+
+## 🏗️ 24. Environment Profile Isolation & Production Tiering
 
 Eruscent complies with cloud-native 12-Factor Application principles through dynamic Spring profile tiering (`application.properties` vs `application-prod.properties`):
 
@@ -845,7 +878,7 @@ Eruscent complies with cloud-native 12-Factor Application principles through dyn
 
 ---
 
-## 📱 24. Responsive Frontend & Mobile Layout Architecture
+## 📱 25. Responsive Frontend & Mobile Layout Architecture
 
 The frontend client layer is built with a modern, high-performance web architecture:
 
@@ -856,7 +889,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🛠️ 25. Technology Stack Breakdown
+## 🛠️ 26. Technology Stack Breakdown
 
 | Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
@@ -872,13 +905,14 @@ The frontend client layer is built with a modern, high-performance web architect
 | **Webhook Verifier** | Svix | `1.90.0` | Cryptographic HMAC webhook verification |
 | **Rate Limiter** | Bucket4j | `8.10.1` | Per-IP token bucket rate limiting |
 | **API Documentation** | OpenAPI / Swagger UI | `2.8.5` | Interactive API documentation & OpenAPI schemas |
+| **CI/CD Automation** | GitHub Actions | Workflows | Live PostgreSQL container integration & security audits |
 | **Database** | PostgreSQL | `16` | Relational data persistence |
 | **Migrations** | Flyway | Built-in | Database versioning & automated migrations |
 | **Email Service** | JavaMailSender | Spring Starter | Asynchronous transactional notification mail |
 
 ---
 
-## 🗺️ 26. High-Level API Domain Map
+## 🗺️ 27. High-Level API Domain Map
 
 All API endpoints are exposed under the `/api/v1` namespace:
 
@@ -900,7 +934,7 @@ All API endpoints are exposed under the `/api/v1` namespace:
 
 ---
 
-## 💡 27. Architecture Strategy: Public Spec & Private Implementation
+## 💡 28. Architecture Strategy: Public Spec & Private Implementation
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
