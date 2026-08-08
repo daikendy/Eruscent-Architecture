@@ -13,9 +13,10 @@ Designed & Engineered by **Eruscent**
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Flyway Migrations](https://img.shields.io/badge/Flyway-PostgreSQL_v16-CC0200?style=for-the-badge&logo=flyway&logoColor=white)](https://flywaydb.org/)
+[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black)](https://swagger.io/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, and an OWASP-hardened security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, and an OWASP-hardened security architecture.
 
 **[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
@@ -63,6 +64,7 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 7. **Resilient Client Interceptor**: Next.js client-side Axios layer featuring automatic exponential backoff retries for transient HTTP errors (502-504, 429, timeouts).
 8. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
 9. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
+10. **Interactive OpenAPI 3.0 Documentation**: Auto-generated Swagger documentation (`/swagger-ui.html`) pre-configured with Bearer JWT authentication schemas.
 
 ---
 
@@ -96,6 +98,7 @@ flowchart TB
             Ctrl_Analytics["Tutor & Dept Analytics"]
             Ctrl_Admin["Super Admin & Telemetry HUD"]
             Ctrl_Webhook["Svix Webhook Listener"]
+            Ctrl_OpenAPI["📖 OpenAPI 3.0 Swagger UI"]
         end
 
         subgraph ExceptionLayer ["Enterprise Error & Concurrency Guard"]
@@ -324,9 +327,9 @@ Eruscent combines dedicated thread pools with automated background schedulers to
 
 ---
 
-## 🔒 9. OWASP-Hardened Security & Cryptographic Audit Pipeline
+## 🔒 9. OWASP-Hardened Security & Multi-Subdomain CORS Matrix
 
-Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities.
+Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities and cross-origin attacks.
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
@@ -357,8 +360,9 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
        └─────────────────────────────────────────────────────────────┘
 ```
 
-### Security Engineering Controls
+### Security & CORS Controls
 
+* **Multi-Subdomain CORS Security Matrix (`SecurityConfig.java`)**: Rather than using dangerous wildcard `*` origins, Eruscent uses strict pattern matching (`https://eruscent.com` and `https://*.eruscent.com`), explicit header allowlists (`Authorization`, `Content-Type`, `Accept`, `X-Requested-With`, `Cache-Control`), and exposed headers.
 * **Tamper-Evident Digital Signatures**: Every audit record saved via `AuditEventListener` contains an `HMAC-SHA256` signature computed over `userId|action|details|timestamp` using an immutable server key.
 * **PII & Credential Scrubbing**: `AuditSecurityUtils` applies regex masking to strip passwords, secret keys, bearer tokens, and email addresses prior to log persistence.
 * **Insecure Direct Object Reference (IDOR) Isolation**: Database queries for session management, time slots, and reviews enforce principal ownership checks (`WHERE s.student.id = :userId OR s.tutor.user.id = :userId`).
@@ -402,16 +406,44 @@ Client API Call (apiClient)
 
 ---
 
-## 📐 11. Uniform Enterprise Exception & Error Contract
+## 📐 11. Uniform Enterprise Exception Contract & ISO-8601 Serialization
 
-Eruscent enforces a unified, RFC 7807 compliant error contract managed by `GlobalExceptionHandler` (`@RestControllerAdvice`):
+Eruscent enforces a unified, RFC 7807 compliant error contract managed by `GlobalExceptionHandler` (`@RestControllerAdvice`) and customized Jackson temporal serialization (`JacksonConfig.java`):
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant UI as 📱 Next.js React UI Component
+    participant Axios as ⚡ apiClient.ts (Frontend Interceptor)
+    participant Ctrl as 🎮 GroupSessionController.java
+    participant Service as ⚙️ GroupSessionService.java
+    participant Handler as 🛡️ GlobalExceptionHandler.java
+    participant DTO as 📄 ApiErrorResponse.java
+
+    UI->>Axios: DELETE /api/v1/lobbies/enrollments/{id}
+    Axios->>Ctrl: Forward HTTP Request with Bearer Token
+    Ctrl->>Service: groupSessionService.dropOutStudent(enrollmentId, studentId)
+    
+    Note over Service: Business Rule Check Failure!<br/>(Time remaining < 24 Hours)
+    Service-->>Ctrl: throw new IllegalStateException("Cancellations must be made at least 24 hours in advance.")
+    Ctrl-->>Handler: Exception bubbles up to @RestControllerAdvice
+    
+    Handler->>DTO: new ApiErrorResponse(400, "Business Rule Violation", ex.getMessage())
+    Note over DTO: Auto-injects LocalDateTime.now()<br/>Jackson Formats ISO-8601 JSON
+    DTO-->>Handler: Returns ApiErrorResponse Record Instance
+    Handler-->>Axios: HTTP 400 Bad Request JSON Payload
+    
+    Note over Axios: apiClient response interceptor extracts:<br/>error.response.data.message
+    Axios-->>UI: Rejects Promise with extractedMessage
+    UI->>UI: toast.error("Cancellations must be made at least 24 hours in advance.")
+```
 
 ```json
 {
   "status": 409,
   "error": "Business Rule Violation",
   "message": "Schedule conflict! You already have another session during this time.",
-  "timestamp": "2026-08-09T00:58:45.123Z"
+  "timestamp": "2026-08-09T02:16:03.123Z"
 }
 ```
 
@@ -429,6 +461,10 @@ Eruscent enforces a unified, RFC 7807 compliant error contract managed by `Globa
 | `ObjectOptimisticLockingFailureException` | `409 Conflict` | `Concurrency Conflict` | Optimistic locking race condition during simultaneous edits |
 | `Exception` (Generic Fallback) | `500 Server Error` | `Internal Server Error` | Unhandled error trapped safely without leaking stack traces |
 
+### Jackson ISO-8601 Temporal Standards (`JacksonConfig.java`)
+
+Configured with `JavaTimeModule` and `WRITE_DATES_AS_TIMESTAMPS = false` to guarantee that all dates/times across all REST endpoints are serialized in strict ISO-8601 format (e.g. `2026-08-09T02:16:03Z`) rather than raw numeric epoch timestamps.
+
 ---
 
 ## 🎯 12. Feature Capability & System Architecture Mapping
@@ -442,6 +478,7 @@ Eruscent enforces a unified, RFC 7807 compliant error contract managed by `Globa
 | **Concurrency Guard** | Prevents double-booking during concurrent seat claims | JPA Optimistic Locking | `@Version` fields, HTTP 409 Conflict handling |
 | **Tutor Analytics** | 7-day earnings yield, retention rate, daily yield analytics | `TutorAnalyticsController` | Custom SQL DTO projections, read-only isolation |
 | **Gamification Engine** | Timezone-aware streak tracking for active students and tutors | `GroupSessionService` & `UserService` | User timezone validation, streak boundary math |
+| **Interactive API Docs**| Self-documenting Swagger UI & OpenAPI 3.0 specification | `springdoc-openapi` & `SwaggerConfig` | Bearer JWT security scheme definition |
 | **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
 | **Super Admin HUD** | Platform-wide telemetry, system anomalies, domain allowlist manager | `SuperAdminController` & `SuperAdminTelemetryController` | Platform RBAC, zero-downtime allowlist updates |
 | **Media Management** | Profile picture avatar uploads & CDN asset delivery | Cloudinary Service | Multipart size checks, rate-limited upload profile |
@@ -528,9 +565,9 @@ erDiagram
 
 ---
 
-## 🐘 14. Versioned Schema Evolution & Automated Migrations
+## 🐘 14. Versioned Schema Evolution & Automated Seeder Engine
 
-Database structure and schema migrations are managed via **Flyway** (`org.flywaydb:flyway-database-postgresql`):
+Database structure, migrations, and development seeders are managed via **Flyway** and Spring Boot initialization beans:
 
 ```
        ┌─────────────────────────────────────────────────────────────┐
@@ -547,11 +584,32 @@ Database structure and schema migrations are managed via **Flyway** (`org.flyway
 ### Database Management Features
 
 * **Version-Controlled Schema**: Database DDL modifications are tracked as immutable SQL migration files in `src/main/resources/db/migration/`.
-* **Automated Bootstrapping**: `DatabaseSeeder.java` seeds baseline administrative roles, sample institutional campuses, and initial domain allowlists during development and staging setup.
+* **Automated Data Seeder (`DatabaseSeeder.java`)**: Automatically seeds baseline administrative roles, sample institutional campuses, departments, active subjects, verified tutors, and initial domain allowlists for zero-friction developer onboarding and automated CI/CD staging environments.
 
 ---
 
-## 🛡️ 15. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
+## 📖 15. OpenAPI 3.0 & Interactive Swagger UI Pipeline
+
+Eruscent automatically compiles its backend route contracts into an interactive **OpenAPI 3.0** documentation suite powered by `springdoc-openapi-starter-webmvc-ui`:
+
+```
+Spring Boot REST Controllers
+         │
+         ▼
+[ springdoc-openapi Annotation & Reflection Engine ]
+         │
+         ├──► Interactive Swagger UI (/swagger-ui.html)
+         └──► OpenAPI 3.0 JSON Contract (raw-openapi.json)
+```
+
+### OpenAPI Documentation Features
+
+* **Interactive API Testing**: Exposes a self-documenting interface at `/swagger-ui.html` for testing REST endpoints.
+* **Bearer JWT Security Scheme**: Configured with global Bearer JWT security components in `SwaggerConfig.java`, allowing developers to authenticate and execute requests directly within the UI.
+
+---
+
+## 🛡️ 16. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
 
 Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 
@@ -568,7 +626,7 @@ To prevent IP spoofing attacks via client-supplied headers, `RateLimitIntercepto
 
 ---
 
-## 🪵 16. Production Structured Telemetry & Observability Pipeline
+## 🪵 17. Production Structured Telemetry & Observability Pipeline
 
 Eruscent emits security and operational telemetry via SLF4J (`SecurityConfig.java`), which formats clean log streams for production log aggregation (e.g. Datadog, CloudWatch, ELK):
 
@@ -602,7 +660,7 @@ When parsed by log collectors into structured JSON telemetry:
 
 ---
 
-## 📈 17. Institutional Analytics & Departmental Bottleneck Telemetry
+## 📈 18. Institutional Analytics & Departmental Bottleneck Telemetry
 
 Eruscent equips department heads and platform operators with real-time academic telemetry:
 
@@ -621,7 +679,29 @@ Eruscent equips department heads and platform operators with real-time academic 
 
 ---
 
-## 📱 18. Responsive Frontend & Mobile Layout Architecture
+## 🏗️ 19. Environment Profile Isolation & Production Tiering
+
+Eruscent complies with cloud-native 12-Factor Application principles through dynamic Spring profile tiering (`application.properties` vs `application-prod.properties`):
+
+```
+                        ┌──────────────────────────────────────────┐
+                        │      SPRING ENVIRONMENT TIER SELECTION   │
+                        └────────────────────┬─────────────────────┘
+                                             │
+                       ┌─────────────────────┴─────────────────────┐
+                       ▼                                           ▼
+          [ Development Profile (Local) ]             [ Production Profile (Railway/Cloud) ]
+          • Local PostgreSQL (strive_db)              • Managed Cloud Postgres with SSL
+          • Mailtrap SMTP Sandbox                     • Enterprise SMTP Notification Gateway
+          • Verbose Local Logging                     • Production JSON Telemetry & Metrics
+```
+
+* **Zero Hardcoded Credentials**: Database connection strings, JWT secrets, Clerk URIs, and Cloudinary keys are injected purely via environment variables.
+* **Dynamic Property Overrides**: Production profiles override local defaults cleanly without code modifications.
+
+---
+
+## 📱 20. Responsive Frontend & Mobile Layout Architecture
 
 The frontend client layer is built with a modern, high-performance web architecture:
 
@@ -632,7 +712,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🛠️ 19. Technology Stack Breakdown
+## 🛠️ 21. Technology Stack Breakdown
 
 | Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
@@ -647,6 +727,7 @@ The frontend client layer is built with a modern, high-performance web architect
 | **Identity Provider** | Clerk | `@clerk/nextjs` | Authentication & token issuance |
 | **Webhook Verifier** | Svix | `1.90.0` | Cryptographic HMAC webhook verification |
 | **Rate Limiter** | Bucket4j | `8.10.1` | Per-IP token bucket rate limiting |
+| **API Documentation** | OpenAPI / Swagger UI | `2.8.5` | Interactive API documentation & OpenAPI schemas |
 | **Database** | PostgreSQL | `16` | Relational data persistence |
 | **Migrations** | Flyway | Built-in | Database versioning & automated migrations |
 | **Media CDN** | Cloudinary | API v2 | Profile avatar & media asset storage |
@@ -654,7 +735,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🗺️ 20. High-Level API Domain Map
+## 🗺️ 22. High-Level API Domain Map
 
 All API endpoints are exposed under the `/api/v1` namespace:
 
@@ -674,7 +755,7 @@ All API endpoints are exposed under the `/api/v1` namespace:
 
 ---
 
-## 💡 21. Architecture Strategy: Public Spec & Private Implementation
+## 💡 23. Architecture Strategy: Public Spec & Private Implementation
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
@@ -708,7 +789,7 @@ Designed by **Eruscent**, this project adopts an **"Open Architecture Specificat
 
 <div align="center">
 
-**Designed & Architected by Eruscent**  
+**Designed & Architected by Daikendy**  
 *Building Secure, Scalable, and Modern Enterprise Systems.*
 
 </div>
