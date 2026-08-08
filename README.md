@@ -19,7 +19,7 @@ Designed & Engineered by **Eruscent**
 
 A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, dynamic JPA Criteria specifications, zero-trust peer messaging, verified review aggregation, in-memory query caching, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, automated containerized CI/CD testing, and an OWASP-hardened security architecture.
 
-**[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
+**[🚀 Live Platform Demo](https://www.eruscent.com/)**
 
 </div>
 
@@ -34,9 +34,8 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 📌 [**1. Executive Summary & Core Multi-Tenant Architecture**](#-1-executive-summary--core-multi-tenant-architecture)
 * 🏗️ [**2. High-Level System Architecture Diagram**](#%EF%B8%8F-2-high-level-system-architecture-diagram)
 * 💡 [**3. Architecture Strategy: Public Spec & Private Implementation**](#-3-architecture-strategy-public-spec--private-implementation)
-
+* 
 <br/>
-
 ### **PART II: CORE ENGINE PILLARS (THE HEAVYWEIGHT FEATURES)**
 
 * 🔐 [**4. Decoupled Identity, JWKS & JIT User Provisioning**](#-4-decoupled-identity-jwks--jit-user-provisioning)
@@ -49,7 +48,6 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 🔥 [**11. Timezone-Aware Gamification & Activity Streak Engine**](#-11-timezone-aware-gamification--activity-streak-engine)
 
 <br/>
-
 ### **PART III: SECURITY, RESILIENCE & EXCEPTION CONTRACTS**
 
 * 🔒 [**12. OWASP-Hardened Security & Multi-Subdomain CORS Matrix**](#-12-owasp-hardened-security--multi-subdomain-cors-matrix)
@@ -58,7 +56,6 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 📐 [**15. Uniform Enterprise Exception Contract & ISO-8601 Serialization**](#-15-uniform-enterprise-exception-contract--iso-8601-serialization)
 
 <br/>
-
 ### **PART IV: TELEMETRY, PERFORMANCE & BACKGROUND ENGINES**
 
 * ⚙️ [**16. High-Concurrency Asynchronous & Scheduled Engine**](#%EF%B8%8F-16-high-concurrency-asynchronous--scheduled-engine)
@@ -67,7 +64,6 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 🪵 [**19. Production Structured Telemetry & Observability Pipeline**](#-19-production-structured-telemetry--observability-pipeline)
 
 <br/>
-
 ### **PART V: DEVOPS, SCHEMA & REFERENCE SCHEMAS**
 
 * 🛠️ [**20. Automated CI/CD Pipeline & Full-Stack DevOps Architecture**](#%EF%B8%8F-20-automated-cicd-pipeline--full-stack-devops-architecture)
