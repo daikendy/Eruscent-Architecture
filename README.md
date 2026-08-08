@@ -34,8 +34,8 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 📌 [**1. Executive Summary & Core Multi-Tenant Architecture**](#-1-executive-summary--core-multi-tenant-architecture)
 * 🏗️ [**2. High-Level System Architecture Diagram**](#%EF%B8%8F-2-high-level-system-architecture-diagram)
 * 💡 [**3. Architecture Strategy: Public Spec & Private Implementation**](#-3-architecture-strategy-public-spec--private-implementation)
-* 
 <br/>
+
 ### **PART II: CORE ENGINE PILLARS (THE HEAVYWEIGHT FEATURES)**
 
 * 🔐 [**4. Decoupled Identity, JWKS & JIT User Provisioning**](#-4-decoupled-identity-jwks--jit-user-provisioning)
@@ -46,24 +46,24 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 * 💬 [**9. Zero-Trust In-Session Peer Chat & Notification Radar**](#-9-zero-trust-in-session-peer-chat--notification-radar)
 * ⭐ [**10. Verified Session Review & Math-Rounded Rating Engine**](#-10-verified-session-review--math-rounded-rating-engine)
 * 🔥 [**11. Timezone-Aware Gamification & Activity Streak Engine**](#-11-timezone-aware-gamification--activity-streak-engine)
-
 <br/>
+
 ### **PART III: SECURITY, RESILIENCE & EXCEPTION CONTRACTS**
 
 * 🔒 [**12. OWASP-Hardened Security & Multi-Subdomain CORS Matrix**](#-12-owasp-hardened-security--multi-subdomain-cors-matrix)
 * 🛡️ [**13. Rate Limiting & Denial-of-Service (DoS) Protection Matrix**](#%EF%B8%8F-13-rate-limiting--denial-of-service-dos-protection-matrix)
 * 🔄 [**14. Resilient Client Interceptor & Automatic Retry Engine**](#-14-resilient-client-interceptor--automatic-retry-engine)
 * 📐 [**15. Uniform Enterprise Exception Contract & ISO-8601 Serialization**](#-15-uniform-enterprise-exception-contract--iso-8601-serialization)
-
 <br/>
+
 ### **PART IV: TELEMETRY, PERFORMANCE & BACKGROUND ENGINES**
 
 * ⚙️ [**16. High-Concurrency Asynchronous & Scheduled Engine**](#%EF%B8%8F-16-high-concurrency-asynchronous--scheduled-engine)
 * 🚀 [**17. In-Memory Telemetry & Treemap Caching Engine (`@Cacheable`)**](#-17-in-memory-telemetry--treemap-caching-engine-cacheable)
 * 📈 [**18. Institutional Analytics & Departmental Bottleneck Telemetry**](#-18-institutional-analytics--departmental-bottleneck-telemetry)
 * 🪵 [**19. Production Structured Telemetry & Observability Pipeline**](#-19-production-structured-telemetry--observability-pipeline)
-
 <br/>
+
 ### **PART V: DEVOPS, SCHEMA & REFERENCE SCHEMAS**
 
 * 🛠️ [**20. Automated CI/CD Pipeline & Full-Stack DevOps Architecture**](#%EF%B8%8F-20-automated-cicd-pipeline--full-stack-devops-architecture)
