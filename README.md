@@ -14,7 +14,7 @@ Designed & Engineered by **Eruscent**
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, automated background maintenance, tamper-evident audit pipelines, and an OWASP-hardened security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, and an OWASP-hardened security architecture.
 
 **[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
@@ -26,34 +26,40 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 **ERUSCENT** is an institutional peer tutoring and academic telemetry platform designed to bridge higher-education institutions with their academic communities (students, tutors, department heads, and platform administrators).
 
+<div align="center">
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                    ERUSCENT MULTI-TENANT HUD                    │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                       UNIVERSITIES                        │  │
+│  └─────────────────────────────┬─────────────────────────────┘  │
+│                                │                                │
+│  ┌─────────────────────────────┴─────────────────────────────┐  │
+│  │                         CAMPUSES                          │  │
+│  └─────────────────────────────┬─────────────────────────────┘  │
+│                                │                                │
+│  ┌─────────────────────────────┴─────────────────────────────┐  │
+│  │                       DEPARTMENTS                         │  │
+│  └──────────────┬─────────────────────────────┬──────────────┘  │
+│                 │                             │                 │
+│  ┌──────────────┴───────────┐   ┌─────────────┴───────────┐     │
+│  │    STUDENT PRINCIPALS    │   │     TUTOR PRINCIPALS    │     │
+│  └──────────────────────────┘   └─────────────────────────┘     │
+└─────────────────────────────────────────────────────────────────┘
 ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │                        ERUSCENT TENANT HUD                      │
-   │  ┌───────────────────────────────────────────────────────────┐  │
-   │  │                       UNIVERSITY                          │  │
-   │  └─────────────────────────────┬─────────────────────────────┘  │
-   │                                │                                │
-   │  ┌─────────────────────────────┴─────────────────────────────┐  │
-   │  │                         CAMPUS                            │  │
-   │  └─────────────────────────────┬─────────────────────────────┘  │
-   │                                │                                │
-   │  ┌─────────────────────────────┴─────────────────────────────┐  │
-   │  │                       DEPARTMENT                          │  │
-   │  └──────────────┬─────────────────────────────┬──────────────┘  │
-   │                 │                             │                 │
-   │  ┌──────────────┴───────────┐   ┌─────────────┴───────────┐     │
-   │  │    STUDENT PRINCIPAL     │   │     TUTOR PRINCIPAL     │     │
-   │  └──────────────────────────┘   └─────────────────────────┘     │
-   └─────────────────────────────────────────────────────────────────┘
-```
+
+</div>
 
 ### Core Architectural Pillars
 
 1. **Hierarchical Multi-Tenancy**: Tenant boundaries (`University` ➔ `Campus` ➔ `Department` ➔ `User`) enforced at both database and service layers with repository-level tenant scoping.
 2. **Decoupled Identity & JIT Provisioning**: Authentication is offloaded to a stateless JWT/JWKS identity provider (Clerk) with Just-In-Time (JIT) user auto-provisioning and self-healing identity synchronization.
-3. **Automated Maintenance & Watchdog Engines**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance watchdog alerts.
-4. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
-5. **Zero-Trust Domain Gating**: Institutional registration is restricted in real time via a Super-Admin-managed, database-backed domain allowlist (e.g., `@dlsu.edu.ph`, `@admu.edu.ph`).
+3. **Dynamic Institutional Domain Gating**: Registration is restricted in real time via a Super-Admin-managed, 3-tier domain allowlist engine (`EmailDomainService`).
+4. **Dual Session & Conflict Engine**: Supports 1-on-1 bookings and multi-student group lobbies with real-time schedule conflict prevention and capacity locks.
+5. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
+6. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
+7. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
 
 ---
 
@@ -79,6 +85,7 @@ flowchart TB
         Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"]
         Jwt_Decoder["jwtDecoder (NimbusJWKSet)"]
         JIT_Engine["🔄 JIT User Sync & Identity Healing"]
+        Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"]
         
         subgraph Controllers ["REST API Domain Controllers"]
             Ctrl_Auth["Auth & Domain Gating"]
@@ -86,6 +93,11 @@ flowchart TB
             Ctrl_Analytics["Tutor & Dept Analytics"]
             Ctrl_Admin["Super Admin & Telemetry HUD"]
             Ctrl_Webhook["Svix Webhook Listener"]
+        end
+
+        subgraph Engines ["Core Business Engines"]
+            Conflict_Engine["📅 Overlap Conflict Resolver"]
+            Streak_Engine["🔥 Timezone-Aware Streak Engine"]
         end
 
         subgraph BackgroundWorkers ["Background Execution Engine"]
@@ -108,9 +120,11 @@ flowchart TB
     Sec_Filter --> Jwt_Decoder
     Jwt_Decoder -.->|Stateless Public Key Fetch| JWKS_Uri
     Sec_Filter --> JIT_Engine
-    JIT_Engine --> Controllers
+    JIT_Engine --> Domain_Guard
+    Domain_Guard --> Controllers
 
-    Controllers -->|Spring Data JPA| DB_Postgres
+    Controllers --> Engines
+    Engines -->|Spring Data JPA| DB_Postgres
     Controllers -->|Async Events| BackgroundWorkers
     Audit_Pool -->|Persist HMAC Signed Logs| DB_Postgres
     Task_Pool -->|Send Transactional Emails| Mail_Provider
@@ -153,7 +167,93 @@ Incoming Request (Bearer JWT)
 
 ---
 
-## ⚡ 4. High-Concurrency Asynchronous & Scheduled Engine
+## 🌐 4. Dynamic Institutional Domain Gating & Allowlist Engine
+
+To maintain strict institutional boundaries, Eruscent incorporates a **3-tier domain validation strategy** managed by `EmailDomainService`:
+
+```
+User Registration Request (email)
+         │
+         ▼
+[ 1. Check Authoritative DB Table (allowed_email_domains) ]
+         │
+         ├──► Active DB Domains Exist? ──► [ Match Email Domain against DB Entries ]
+         │                                         ├── Allowed ──► Proceed
+         │                                         └── Denied  ──► Block Registration
+         │
+         └──► DB Table Empty? (Bootstrap State)
+                     │
+                     ▼
+        [ 2. Fallback to Env Property (app.registration.allowed-domains) ]
+                     │
+                     ├── Env Configured? ──► [ Match Email Domain against Env List ]
+                     │
+                     └── Env Blank? ─────► [ 3. Default Fallback: DENY ALL ]
+```
+
+### Key Domain Guard Controls
+
+* **Zero-Downtime Domain Management**: Super Admins can dynamically add, activate, deactivate, or delete permitted university email domains (e.g., `@dlsu.edu.ph`, `@admu.edu.ph`) with zero server redeployment.
+* **Fail-Secure Default**: If both the database allowlist and environment fallbacks are unconfigured, registration automatically fails secure (`log.warn("[DOMAIN GUARD] Registration blocked")`).
+
+---
+
+## 📅 5. Dual Session Architecture & Schedule Conflict Engine
+
+Eruscent implements two distinct tutoring session modes with real-time schedule conflict resolution:
+
+```
+                            ┌──────────────────────────────────────────┐
+                            │        DUAL TUTORING SESSION MODES       │
+                            └────────────────────┬─────────────────────┘
+                                                 │
+                       ┌─────────────────────────┴─────────────────────────┐
+                       ▼                                                   ▼
+         [ 1-on-1 Private Sessions ]                         [ Group Session Lobbies ]
+         • Calendar time slot booking                        • Multi-student group lobby
+         • Direct tutor acceptance/rejection                 • Locked group discount pricing (50% multiplier)
+         • Single student reservation                        • Dynamic capacity bounds (enrolledCount vs maxCapacity)
+         • Pending auto-expiry (15 mins)                     • Hourly low-attendance watchdog alert
+```
+
+### Schedule Conflict & Business Controls
+
+1. **Overlapping Collision Guard**: When a tutor creates a group lobby or accepts a 1:1 request, `groupSessionRepository.hasOverlappingSessions()` and `tutoringSessionRepository.hasOverlappingSessions()` check for time collisions across both modes.
+2. **Automatic Time Slot Cleanup**: Creating a group class automatically purges unbooked individual time slots (`deleteUnbookedTimeSlots`) falling within the class window.
+3. **Abuse Protection & Cancellation Windows**: Students and tutors cannot cancel sessions or drop out of group classes within 24 hours of the scheduled start time (`app.business.cancellation-window-hours=24`).
+4. **Group Pricing Multipliers**: Group class ticket prices are automatically derived from the tutor's base hourly rate multiplied by a configurable discount factor (`app.business.pricing.group-multiplier=0.5`).
+
+---
+
+## 🔥 6. Timezone-Aware Gamification & Activity Streak Engine
+
+To encourage consistent peer learning, Eruscent tracks daily activity streaks for both students and tutors (`updateStreak` in `GroupSessionService` & `TutoringSessionService`).
+
+```
+Session Completed Event
+         │
+         ▼
+[ Extract User Preference Timezone (e.g., "Asia/Manila", "America/New_York") ]
+         │
+         ▼
+[ Convert UTC Timestamp to User ZonedDateTime ]
+         │
+         ▼
+[ Compare Local Date against Last Streak Date ]
+         │
+         ├── Last Date = Yesterday (todayLocal - 1)  ──► Streak Count++
+         ├── Last Date = Today (Same Local Day)      ──► Maintain Current Streak
+         └── Last Date < Yesterday (Missed Day)      ──► Reset Streak Count to 1
+```
+
+### Gamification Features
+
+* **Timezone Precision**: Streak boundaries are computed against each user's declared timezone (`user.getTimezone()`) rather than UTC, preventing unfair streak resets across different global regions.
+* **Dual Participant Streaks**: Completing a group or 1:1 session updates the streak counters for both the tutor and all attending students simultaneously.
+
+---
+
+## ⚡ 7. High-Concurrency Asynchronous & Scheduled Engine
 
 Eruscent combines dedicated thread pools with automated background schedulers to guarantee high throughput and clean data maintenance.
 
@@ -190,7 +290,7 @@ Eruscent combines dedicated thread pools with automated background schedulers to
 
 ---
 
-## 🔒 5. OWASP-Hardened Security & Cryptographic Audit Pipeline
+## 🔒 8. OWASP-Hardened Security & Cryptographic Audit Pipeline
 
 Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities.
 
@@ -236,7 +336,7 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 
 ---
 
-## 🎯 6. Feature Capability & System Architecture Mapping
+## 🎯 9. Feature Capability & System Architecture Mapping
 
 | Feature Capability | Functional Description | Architecture Component | Primary Security & Operational Control |
 |---|---|---|---|
@@ -245,13 +345,14 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 | **1:1 Session Engine** | Real-time booking calendar, time slot locks, session state machine | `TutoringSessionService` | IDOR owner isolation, pending auto-expiry |
 | **Group Session Lobbies**| Multi-student group sessions, capacity bounds, automated enrollment | `GroupSessionService` & `Enrollment` | Capacity checks, hourly low-attendance watchdog |
 | **Tutor Analytics** | 7-day earnings yield, retention rate, daily yield analytics | `TutorAnalyticsController` | Custom SQL DTO projections, read-only isolation |
+| **Gamification Engine** | Timezone-aware streak tracking for active students and tutors | `GroupSessionService` & `UserService` | User timezone validation, streak boundary math |
 | **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
 | **Super Admin HUD** | Platform-wide telemetry, system anomalies, domain allowlist manager | `SuperAdminController` & `SuperAdminTelemetryController` | Platform RBAC, zero-downtime allowlist updates |
 | **Media Management** | Profile picture avatar uploads & CDN asset delivery | Cloudinary Service | Multipart size checks, rate-limited upload profile |
 
 ---
 
-## 📊 7. Entity-Relationship & Data Model Overview
+## 📊 10. Entity-Relationship & Data Model Overview
 
 ```mermaid
 erDiagram
@@ -275,6 +376,9 @@ erDiagram
         string email UK
         string full_name
         string profile_picture_url
+        integer streak_count
+        timestamp last_streak_date
+        string timezone
         enum roles
         boolean is_active
         timestamp created_at
@@ -305,7 +409,8 @@ erDiagram
         bigint tutor_profile_id FK
         string title
         integer max_capacity
-        integer current_capacity
+        integer enrolled_count
+        decimal locked_ticket_price
         boolean low_attendance_warning_sent
         enum status
     }
@@ -327,7 +432,7 @@ erDiagram
 
 ---
 
-## 🛡️ 8. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
+## 🛡️ 11. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
 
 Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 
@@ -344,17 +449,23 @@ To prevent IP spoofing attacks via client-supplied headers, `RateLimitIntercepto
 
 ---
 
-## 🪵 9. Production Structured Telemetry & Observability Pipeline
+## 🪵 12. Production Structured Telemetry & Observability Pipeline
 
-Eruscent includes structured telemetry and observability out of the box:
+Eruscent emits security and operational telemetry via SLF4J (`SecurityConfig.java`), which formats clean log streams for production log aggregation (e.g. Datadog, CloudWatch, ELK):
+
+```log
+2026-08-08T23:15:50.123+08:00 DEBUG 14208 --- [backend] [http-nio-8080-exec-1] c.s.backend.config.SecurityConfig       : >>> SECURITY TELEMETRY: ClerkId=user_2tX9kL...7mP, UserFound=true, ResolvedRoles=[ROLE_STUDENT, ROLE_TUTOR], MappedAuthorities=[ROLE_STUDENT, ROLE_TUTOR]
+```
+
+When parsed by log collectors into structured JSON telemetry:
 
 ```json
 {
-  "timestamp": "2026-08-08T23:15:50.000Z",
-  "level": "INFO",
+  "timestamp": "2026-08-08T23:15:50.123Z",
+  "level": "DEBUG",
   "logger": "com.strive.backend.config.SecurityConfig",
   "thread": "http-nio-8080-exec-1",
-  "message": "SECURITY TELEMETRY",
+  "message": ">>> SECURITY TELEMETRY",
   "context": {
     "clerkId": "user_2tX9kL...7mP",
     "userFound": true,
@@ -366,13 +477,32 @@ Eruscent includes structured telemetry and observability out of the box:
 
 ### Observability Features
 
-* **Health Probes**: Spring Boot Actuator health and readiness endpoints configured at `/actuator/health`.
-* **Structured Log Formatting**: SLF4J and Logback configured for structured ISO-8601 JSON log aggregation.
+* **Health Probes**: Spring Boot Actuator health and readiness endpoints exposed at `/actuator/health` (configured with `show-details=when-authorized`).
+* **SLF4J Telemetry Logging**: Debug-level JWT security telemetry tracking Clerk user lookup, JIT sync state, and mapped granted authorities.
 * **Department KPI Historical Snapshots**: 30-day historical analytics tracking session completion rates, student retention, and departmental subject bottlenecks.
 
 ---
 
-## 📱 10. Responsive Frontend & Mobile Layout Architecture
+## 📈 13. Institutional Analytics & Departmental Bottleneck Telemetry
+
+Eruscent equips department heads and platform operators with real-time academic telemetry:
+
+```
+[ Department Session Logs ] ──► [ Query Aggregator ] ──► [ Department KPI Telemetry ]
+                                                               • 30-Day Completion Rate
+                                                               • Tutor Utilization Rate
+                                                               • Subject Bottleneck Radar
+```
+
+### Telemetry Capabilities
+
+* **Subject Bottleneck Radar**: Identifies academic courses with high student booking demand but low tutor availability, allowing department admins to target tutor recruitment.
+* **Tutor Retention & Yield Analytics**: Calculates 7-day earnings yield, student retention percentages, and average daily yield per tutor profile.
+* **Super Admin System Heatmaps**: Platform-wide telemetry visualizing active session density and campus registration trends across institutions.
+
+---
+
+## 📱 14. Responsive Frontend & Mobile Layout Architecture
 
 The frontend client layer is built with a modern, high-performance web architecture:
 
@@ -383,7 +513,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🛠️ 11. Technology Stack Breakdown
+## 🛠️ 15. Technology Stack Breakdown
 
 | Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
@@ -405,7 +535,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🗺️ 12. High-Level API Domain Map
+## 🗺️ 16. High-Level API Domain Map
 
 All API endpoints are exposed under the `/api/v1` namespace:
 
@@ -425,7 +555,7 @@ All API endpoints are exposed under the `/api/v1` namespace:
 
 ---
 
-## 💡 13. Architecture Strategy: Public Spec & Private Implementation
+## 💡 17. Architecture Strategy: Public Spec & Private Implementation
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
