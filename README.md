@@ -92,20 +92,15 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 ```mermaid
 flowchart TD
-    classDef univ fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff,font-weight:bold;
-    classDef campus fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff,font-weight:bold;
-    classDef dept fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff,font-weight:bold;
-    classDef user fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#ffffff,font-weight:bold;
-
     subgraph HUD ["🏛️ ERUSCENT MULTI-TENANT INSTITUTIONAL HIERARCHY"]
         direction TD
-        U["🏫 UNIVERSITIES (Tenant Root Isolation)"] ::: univ
-        C["🏬 CAMPUSES (Domain-Locked Operations)"] ::: campus
-        D["🔬 DEPARTMENTS (Academic Scoping & Telemetry)"] ::: dept
+        U["🏫 UNIVERSITIES (Tenant Root Isolation)"]
+        C["🏬 CAMPUSES (Domain-Locked Operations)"]
+        D["🔬 DEPARTMENTS (Academic Scoping & Telemetry)"]
         
         subgraph Principals ["👥 USER PRINCIPALS"]
-            S["🎓 STUDENT PRINCIPALS"] ::: user
-            T["🧑‍🏫 TUTOR PRINCIPALS"] ::: user
+            S["🎓 STUDENT PRINCIPALS"]
+            T["🧑‍🏫 TUTOR PRINCIPALS"]
         end
     end
 
@@ -113,6 +108,16 @@ flowchart TD
     C --> D
     D --> S
     D --> T
+
+    classDef univ fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef campus fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef dept fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef user fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#ffffff;
+
+    class U univ;
+    class C campus;
+    class D dept;
+    class S,T user;
 ```
 
 ### Core Architectural Pillars
@@ -138,32 +143,26 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef auth fill:#581c87,stroke:#c084fc,stroke-width:2px,color:#fff;
-    classDef backend fill:#065f46,stroke:#34d399,stroke-width:2px,color:#fff;
-    classDef devops fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#fff;
-    classDef data fill:#1e3a8a,stroke:#60a5fa,stroke-width:2px,color:#fff;
-
     subgraph ClientLayer ["📱 Client Layer (Next.js 16 App Router)"]
-        UI_Student["🎓 Student Marketplace & Dashboard"] ::: client
-        UI_Tutor["🧑‍🏫 Tutor Management & Analytics"] ::: client
-        UI_Admin["🛡️ Department Admin Portal"] ::: client
-        UI_Super["👑 Super Admin Telemetry HUD"] ::: client
-        Axios_Client["⚡ Resilient Axios Client (Retry Interceptor)"] ::: client
+        UI_Student["🎓 Student Marketplace & Dashboard"]
+        UI_Tutor["🧑‍🏫 Tutor Management & Analytics"]
+        UI_Admin["🛡️ Department Admin Portal"]
+        UI_Super["👑 Super Admin Telemetry HUD"]
+        Axios_Client["⚡ Resilient Axios Client (Retry Interceptor)"]
     end
 
     subgraph AuthLayer ["🔐 Identity & JWKS Provider"]
-        Clerk_IdP["🔐 Clerk Identity Provider & Avatar CDN"] ::: auth
-        JWKS_Uri["🔑 Public JWKS Keys Endpoint"] ::: auth
+        Clerk_IdP["🔐 Clerk Identity Provider & Avatar CDN"]
+        JWKS_Uri["🔑 Public JWKS Keys Endpoint"]
     end
 
     subgraph BackendLayer ["⚙️ Backend Core — Spring Boot 3 Engine"]
-        Sec_Filter["🛡️ Spring Security Filter Chain"] ::: backend
-        Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"] ::: backend
-        Jwt_Decoder["jwtDecoder (NimbusJWKSet)"] ::: backend
-        JIT_Engine["🔄 JIT User Sync & Identity Healing"] ::: backend
-        Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"] ::: backend
-        Cache_Manager["🚀 Spring @Cacheable Layer"] ::: backend
+        Sec_Filter["🛡️ Spring Security Filter Chain"]
+        Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"]
+        Jwt_Decoder["jwtDecoder (NimbusJWKSet)"]
+        JIT_Engine["🔄 JIT User Sync & Identity Healing"]
+        Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"]
+        Cache_Manager["🚀 Spring @Cacheable Layer"]
         
         subgraph Controllers ["REST API Domain Controllers"]
             Ctrl_Auth["Auth & Domain Gating"]
@@ -197,13 +196,13 @@ flowchart TB
     end
 
     subgraph DevOpsLayer ["🛠️ DevOps & Automated CI/CD"]
-        GHA_CI["🛠️ GitHub Actions (Java 21 + Live Postgres 16 Container)"] ::: devops
-        GHA_Audit["🛡️ Weekly Dependency Security Audit Cron"] ::: devops
+        GHA_CI["🛠️ GitHub Actions (Java 21 + Live Postgres 16 Container)"]
+        GHA_Audit["🛡️ Weekly Dependency Security Audit Cron"]
     end
 
     subgraph DataLayer ["🐘 Persistence & External Services"]
-        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")] ::: data
-        Mail_Provider["📨 SMTP / JavaMailSender"] ::: data
+        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
+        Mail_Provider["📨 SMTP / JavaMailSender"]
     end
 
     ClientLayer --> Axios_Client
@@ -228,6 +227,18 @@ flowchart TB
 
     GHA_CI -.->|Automated Integration Build| BackendLayer
     GHA_Audit -.->|Automated Vulnerability Scanner| ClientLayer
+
+    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef auth fill:#581c87,stroke:#c084fc,stroke-width:2px,color:#ffffff;
+    classDef backend fill:#065f46,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef devops fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#ffffff;
+    classDef data fill:#1e3a8a,stroke:#60a5fa,stroke-width:2px,color:#ffffff;
+
+    class UI_Student,UI_Tutor,UI_Admin,UI_Super,Axios_Client client;
+    class Clerk_IdP,JWKS_Uri auth;
+    class Sec_Filter,Rate_Limiter,Jwt_Decoder,JIT_Engine,Domain_Guard,Cache_Manager backend;
+    class GHA_CI,GHA_Audit devops;
+    class DB_Postgres,Mail_Provider data;
 ```
 
 ---
@@ -238,23 +249,26 @@ Designed by **Eruscent**, this project adopts an **"Open Architecture Specificat
 
 ```mermaid
 flowchart TD
-    classDef pub fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff,font-weight:bold;
-    classDef priv fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#fff,font-weight:bold;
-
     subgraph PublicRepo ["🌐 PUBLIC SPECIFICATION REPOSITORY (GitHub Public)"]
-        P1["• Architectural Blueprints & Flowcharts"] ::: pub
-        P2["• OpenAPI 3.0 Route Contracts & Domain Maps"] ::: pub
-        P3["• Entity-Relationship Diagrams (ERD)"] ::: pub
-        P4["• Security Audit Controls & Rate Limiting Matrices"] ::: pub
+        P1["• Architectural Blueprints & Flowcharts"]
+        P2["• OpenAPI 3.0 Route Contracts & Domain Maps"]
+        P3["• Entity-Relationship Diagrams (ERD)"]
+        P4["• Security Audit Controls & Rate Limiting Matrices"]
     end
 
     subgraph PrivateRepo ["🔒 PRIVATE IMPLEMENTATION REPOSITORY (GitHub Private)"]
-        R1["• Proprietary Java 21 / Spring Boot 3 Core Engine"] ::: priv
-        R2["• Next.js 16 App Router Frontend Codebase"] ::: priv
-        R3["• Production Flyway Migrations & Cloud Credentials"] ::: priv
+        R1["• Proprietary Java 21 / Spring Boot 3 Core Engine"]
+        R2["• Next.js 16 App Router Frontend Codebase"]
+        R3["• Production Flyway Migrations & Cloud Credentials"]
     end
 
     PublicRepo ==>|Defines System Architecture Contract| PrivateRepo
+
+    classDef pub fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef priv fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+
+    class P1,P2,P3,P4 pub;
+    class R1,R2,R3 priv;
 ```
 
 ---
@@ -267,19 +281,23 @@ Eruscent decouples identity authentication from application authorization by lev
 
 ```mermaid
 flowchart TD
-    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-    classDef act fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#fff;
-
-    A["Incoming Request (Bearer JWT)"] ::: step --> B["JwtDecoder (NimbusJwtDecoder with JwkSetUri)"] ::: step
-    B --> C["Extract Clerk Principal ID (jwt.getSubject())"] ::: step
-    C --> D{"User Found in DB?"} ::: step
+    A["Incoming Request (Bearer JWT)"] --> B["JwtDecoder (NimbusJwtDecoder with JwkSetUri)"]
+    B --> C["Extract Clerk Principal ID (jwt.getSubject())"]
+    C --> D{"User Found in DB?"}
     
-    D -- "YES" --> E["Identity Self-Healing (Sync Name & Profile Picture)"] ::: pass
-    D -- "NO" --> F["Just-In-Time (JIT) Auto-Provisioning"] ::: act
+    D -- "YES" --> E["Identity Self-Healing (Sync Name & Profile Picture)"]
+    D -- "NO" --> F["Just-In-Time (JIT) Auto-Provisioning"]
     
-    E --> G["Map Granted Authorities & Dual Roles (ROLE_STUDENT, ROLE_TUTOR, ROLE_ADMIN)"] ::: pass
+    E --> G["Map Granted Authorities & Dual Roles (ROLE_STUDENT, ROLE_TUTOR, ROLE_ADMIN)"]
     F --> G
+
+    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef act fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#ffffff;
+
+    class A,B,C,D step;
+    class E,G pass;
+    class F act;
 ```
 
 ### Identity Architecture Features
@@ -297,20 +315,24 @@ To maintain strict institutional boundaries, Eruscent incorporates a **3-tier do
 
 ```mermaid
 flowchart TD
-    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
-
-    A["User Registration Request (email)"] ::: check --> B["1. Check Authoritative DB Table (allowed_email_domains)"] ::: check
-    B --> C{"Active DB Domains Exist?"} ::: check
+    A["User Registration Request (email)"] --> B["1. Check Authoritative DB Table (allowed_email_domains)"]
+    B --> C{"Active DB Domains Exist?"}
     
-    C -- "YES" --> D["Match Email Domain against DB Entries"] ::: check
-    D -- "Match" --> E["✅ Allow Registration"] ::: ok
-    D -- "No Match" --> F["❌ Block Registration"] ::: deny
+    C -- "YES" --> D["Match Email Domain against DB Entries"]
+    D -- "Match" --> E["✅ Allow Registration"]
+    D -- "No Match" --> F["❌ Block Registration"]
     
-    C -- "NO (Bootstrap)" --> G["2. Fallback to Env Property (app.registration.allowed-domains)"] ::: check
+    C -- "NO (Bootstrap)" --> G["2. Fallback to Env Property (app.registration.allowed-domains)"]
     G -- "Env Set & Match" --> E
-    G -- "Env Blank / Unconfigured" --> H["3. Default Fallback: DENY ALL"] ::: deny
+    G -- "Env Blank / Unconfigured" --> H["3. Default Fallback: DENY ALL"]
+
+    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff;
+
+    class A,B,C,D,G check;
+    class E ok;
+    class F,H deny;
 ```
 
 ---
@@ -321,22 +343,25 @@ Eruscent implements two distinct tutoring session modes with real-time schedule 
 
 ```mermaid
 flowchart TD
-    classDef mode fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
-    classDef feature fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    Root["🗓️ DUAL TUTORING SESSION ARCHITECTURE"]
+    Root --> M1["1-on-1 Private Sessions"]
+    Root --> M2["Group Session Lobbies"]
 
-    Root["🗓️ DUAL TUTORING SESSION ARCHITECTURE"] ::: mode
-    Root --> M1["1-on-1 Private Sessions"] ::: mode
-    Root --> M2["Group Session Lobbies"] ::: mode
+    M1 --> F1["• Calendar time slot booking"]
+    M1 --> F2["• Direct tutor acceptance / rejection"]
+    M1 --> F3["• Single student reservation"]
+    M1 --> F4["• Pending auto-expiry (15 mins)"]
 
-    M1 --> F1["• Calendar time slot booking"] ::: feature
-    M1 --> F2["• Direct tutor acceptance / rejection"] ::: feature
-    M1 --> F3["• Single student reservation"] ::: feature
-    M1 --> F4["• Pending auto-expiry (15 mins)"] ::: feature
+    M2 --> G1["• Multi-student group lobby"]
+    M2 --> G2["• Locked group discount pricing (50% multiplier)"]
+    M2 --> G3["• Dynamic capacity bounds (enrolled vs max)"]
+    M2 --> G4["• Hourly low-attendance watchdog alert"]
 
-    M2 --> G1["• Multi-student group lobby"] ::: feature
-    M2 --> G2["• Locked group discount pricing (50% multiplier)"] ::: feature
-    M2 --> G3["• Dynamic capacity bounds (enrolled vs max)"] ::: feature
-    M2 --> G4["• Hourly low-attendance watchdog alert"] ::: feature
+    classDef mode fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef feature fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+
+    class Root,M1,M2 mode;
+    class F1,F2,F3,F4,G1,G2,G3,G4 feature;
 ```
 
 ---
@@ -347,19 +372,23 @@ During high-demand registration windows or popular group lobby launches, Eruscen
 
 ```mermaid
 flowchart TD
-    classDef tx fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-    classDef fail fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
+    A["Student A (Enrolls in Lobby)"] --> C["Simultaneous Database Mutation Attempt"]
+    B["Student B (Enrolls in Lobby)"] --> C
+    
+    C --> D["JPA Optimistic Locking Check (@Version)"]
+    
+    D --> E["1st Transaction Succeeds (Version Incremented)"]
+    D --> F["2nd Transaction Fails (OptimisticLockingFailureException)"]
+    
+    F --> G["GlobalExceptionHandler Traps & Returns HTTP 409 Conflict"]
 
-    A["Student A (Enrolls in Lobby)"] ::: tx --> C["Simultaneous Database Mutation Attempt"] ::: tx
-    B["Student B (Enrolls in Lobby)"] ::: tx --> C
-    
-    C --> D["JPA Optimistic Locking Check (@Version)"] ::: tx
-    
-    D --> E["1st Transaction Succeeds (Version Incremented)"] ::: ok
-    D --> F["2nd Transaction Fails (OptimisticLockingFailureException)"] ::: fail
-    
-    F --> G["GlobalExceptionHandler Traps & Returns HTTP 409 Conflict"] ::: fail
+    classDef tx fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef fail fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff;
+
+    class A,B,C,D tx;
+    class E ok;
+    class F,G fail;
 ```
 
 ---
@@ -370,18 +399,21 @@ The tutor marketplace directory uses a dynamic query specification builder (`Tut
 
 ```mermaid
 flowchart TD
-    classDef spec fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
-    classDef pred fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    A["Search Request (campusId, searchTerm, maxPrice, minRating)"] --> B["CriteriaBuilder Predicate Assembly"]
+    
+    B --> P1["• campusId Filter (Join User -> Campus UUID)"]
+    B --> P2["• Mandatory Guard (User.isVerified = true)"]
+    B --> P3["• Search Term Match (OR Name, Bio, Subject, Course Code)"]
+    B --> P4["• Budget Filter (hourlyRate <= maxPrice)"]
+    B --> P5["• Quality Threshold (rating >= minRating)"]
+    
+    P1 & P2 & P3 & P4 & P5 --> C["Execute Deduplicated Distinct Query (query.distinct(true))"]
 
-    A["Search Request (campusId, searchTerm, maxPrice, minRating)"] ::: spec --> B["CriteriaBuilder Predicate Assembly"] ::: spec
-    
-    B --> P1["• campusId Filter (Join User -> Campus UUID)"] ::: pred
-    B --> P2["• Mandatory Guard (User.isVerified = true)"] ::: pred
-    B --> P3["• Search Term Match (OR Name, Bio, Subject, Course Code)"] ::: pred
-    B --> P4["• Budget Filter (hourlyRate <= maxPrice)"] ::: pred
-    B --> P5["• Quality Threshold (rating >= minRating)"] ::: pred
-    
-    P1 & P2 & P3 & P4 & P5 --> C["Execute Deduplicated Distinct Query (query.distinct(true))"] ::: spec
+    classDef spec fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef pred fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+
+    class A,B,C spec;
+    class P1,P2,P3,P4,P5 pred;
 ```
 
 ---
@@ -392,20 +424,25 @@ Eruscent provides encrypted, participant-restricted peer messaging (`MessageServ
 
 ```mermaid
 flowchart TD
-    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
-    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-
-    A["Chat Access Request (referenceId, referenceType, currentUser)"] ::: req --> B["Access Guard Bouncer (validateUserAccess)"] ::: check
+    A["Chat Access Request (referenceId, referenceType, currentUser)"] --> B["Access Guard Bouncer (validateUserAccess)"]
     
-    B -- "PRIVATE" --> C{"Principal is Student OR Tutor?"} ::: check
-    C -- "YES" --> D["Grant Access & Fetch Chat History"] ::: pass
-    C -- "NO" --> E["❌ Access Denied"] ::: deny
+    B -- "PRIVATE" --> C{"Principal is Student OR Tutor?"}
+    C -- "YES" --> D["Grant Access & Fetch Chat History"]
+    C -- "NO" --> E["❌ Access Denied"]
 
-    B -- "GROUP" --> F{"Principal is Tutor OR Active Enrolled Student?"} ::: check
+    B -- "GROUP" --> F{"Principal is Tutor OR Active Enrolled Student?"}
     F -- "YES & Active" --> D
-    F -- "Canceled Enrollment" --> G["❌ Access Revoked"] ::: deny
+    F -- "Canceled Enrollment" --> G["❌ Access Revoked"]
+
+    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A req;
+    class B,C,F check;
+    class D pass;
+    class E,G deny;
 ```
 
 ---
@@ -416,14 +453,17 @@ Tutor review submission and rating aggregation are governed by strict verificati
 
 ```mermaid
 flowchart TD
-    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    A["Review Submission Request (rating, comment, sessionId/groupSessionId)"] --> B["1. Verify Session Participation & Status = COMPLETED"]
+    B --> C["2. Anti-Self-Review Guard (Ensure Student ID != Tutor ID)"]
+    C --> D["3. Duplicate Review Check (existsBySessionId)"]
+    D --> E["4. Save Review & Recalculate Aggregate Rating"]
+    E --> F["Math.round(newAverage * 10.0) / 10.0 ──► Update TutorProfile"]
 
-    A["Review Submission Request (rating, comment, sessionId/groupSessionId)"] ::: step --> B["1. Verify Session Participation & Status = COMPLETED"] ::: step
-    B --> C["2. Anti-Self-Review Guard (Ensure Student ID != Tutor ID)"] ::: step
-    C --> D["3. Duplicate Review Check (existsBySessionId)"] ::: step
-    D --> E["4. Save Review & Recalculate Aggregate Rating"] ::: step
-    E --> F["Math.round(newAverage * 10.0) / 10.0 ──► Update TutorProfile"] ::: pass
+    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A,B,C,D,E step;
+    class F pass;
 ```
 
 ---
@@ -434,17 +474,21 @@ To encourage consistent peer learning, Eruscent tracks daily activity streaks fo
 
 ```mermaid
 flowchart TD
-    classDef event fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef math fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef act fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-
-    A["Session Completed Event"] ::: event --> B["Extract User Timezone (e.g. 'Asia/Manila', 'America/New_York')"] ::: math
-    B --> C["Convert UTC Timestamp to User ZonedDateTime"] ::: math
-    C --> D{"Compare Local Date vs Last Streak Date"} ::: math
+    A["Session Completed Event"] --> B["Extract User Timezone (e.g. 'Asia/Manila', 'America/New_York')"]
+    B --> C["Convert UTC Timestamp to User ZonedDateTime"]
+    C --> D{"Compare Local Date vs Last Streak Date"}
     
-    D -- "Yesterday (todayLocal - 1)" --> E["🔥 Increment Streak Count++"] ::: act
-    D -- "Today (Same Local Day)" --> F["Maintain Current Streak"] ::: act
-    D -- "< Yesterday (Missed Day)" --> G["Reset Streak Count to 1"] ::: math
+    D -- "Yesterday (todayLocal - 1)" --> E["🔥 Increment Streak Count++"]
+    D -- "Today (Same Local Day)" --> F["Maintain Current Streak"]
+    D -- "< Yesterday (Missed Day)" --> G["Reset Streak Count to 1"]
+
+    classDef event fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef math fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef act fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A event;
+    class B,C,D,G math;
+    class E,F act;
 ```
 
 ---
@@ -457,13 +501,16 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 
 ```mermaid
 flowchart TD
-    classDef sec fill:#1e1b4b,stroke:#c084fc,stroke-width:2px,color:#fff;
-    classDef act fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    A["AUDIT EVENT GENERATED"] --> B["1. PII & Secret Scrubbing (Regex Redaction)"]
+    B --> C["2. Log Forging & XSS Sanitization (CRLF & HtmlUtils)"]
+    C --> D["3. HMAC-SHA256 Digital Signature Generation"]
+    D --> E["4. Asynchronous DB Persistence (auditExecutor)"]
 
-    A["AUDIT EVENT GENERATED"] ::: sec --> B["1. PII & Secret Scrubbing (Regex Redaction)"] ::: act
-    B --> C["2. Log Forging & XSS Sanitization (CRLF & HtmlUtils)"] ::: act
-    C --> D["3. HMAC-SHA256 Digital Signature Generation"] ::: act
-    D --> E["4. Asynchronous DB Persistence (auditExecutor)"] ::: sec
+    classDef sec fill:#1e1b4b,stroke:#c084fc,stroke-width:2px,color:#ffffff;
+    classDef act fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+
+    class A,E sec;
+    class B,C,D act;
 ```
 
 ---
@@ -487,18 +534,22 @@ The Next.js frontend client (`apiClient.ts`) is fortified with an intelligent HT
 
 ```mermaid
 flowchart TD
-    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef retry fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#fff;
-    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-
-    A["Client API Call (apiClient)"] ::: client --> B["1. Bearer Token Async Guard (Polls Clerk)"] ::: client
-    B --> C["2. Execute HTTP Request"] ::: client
+    A["Client API Call (apiClient)"] --> B["1. Bearer Token Async Guard (Polls Clerk)"]
+    B --> C["2. Execute HTTP Request"]
     
-    C -- "200 OK" --> D["Return Payload"] ::: ok
-    C -- "Transient Error (502, 503, 504, 429, Timeout)" --> E["3. Exponential Backoff Retry (Max 2 Retries, 1s Delay)"] ::: retry
+    C -- "200 OK" --> D["Return Payload"]
+    C -- "Transient Error (502, 503, 504, 429, Timeout)" --> E["3. Exponential Backoff Retry (Max 2 Retries, 1s Delay)"]
     
     E -- "Retry Succeeds" --> D
-    E -- "Retries Exhausted" --> F["Extract Structured Error Message for UI Toast"] ::: retry
+    E -- "Retries Exhausted" --> F["Extract Structured Error Message for UI Toast"]
+
+    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef retry fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#ffffff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A,B,C client;
+    class D ok;
+    class E,F retry;
 ```
 
 ---
@@ -554,15 +605,18 @@ Eruscent combines dedicated thread pools with automated background schedulers to
 
 ```mermaid
 flowchart TD
-    classDef pool fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef item fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    Root["⚡ SPRING @ENABLEASYNC THREAD POOLS"]
+    Root --> P1["auditExecutor Pool (2 Core / 5 Max / 100 Queue)"]
+    Root --> P2["taskExecutor Pool (5 Core / 10 Max / 500 Queue)"]
 
-    Root["⚡ SPRING @ENABLEASYNC THREAD POOLS"] ::: pool
-    Root --> P1["auditExecutor Pool (2 Core / 5 Max / 100 Queue)"] ::: pool
-    Root --> P2["taskExecutor Pool (5 Core / 10 Max / 500 Queue)"] ::: pool
+    P1 --> I1["• Isolates HMAC Audit Logging"]
+    P2 --> I2["• Handles Email Notifications & Webhooks"]
 
-    P1 --> I1["• Isolates HMAC Audit Logging"] ::: item
-    P2 --> I2["• Handles Email Notifications & Webhooks"] ::: item
+    classDef pool fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef item fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+
+    class Root,P1,P2 pool;
+    class I1,I2 item;
 ```
 
 ---
@@ -573,15 +627,19 @@ To maintain ultra-low response latency across large multi-tenant institutional n
 
 ```mermaid
 flowchart TD
-    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef cache fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef hit fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
-
-    A["Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)"] ::: req --> B["Check Spring Cache Region ('globalKpis' / 'globalHeatmap')"] ::: cache
+    A["Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)"] --> B["Check Spring Cache Region ('globalKpis' / 'globalHeatmap')"]
     
-    B -- "Cache Hit" --> C["⚡ Return Cached Telemetry DTO (Zero DB Latency)"] ::: hit
-    B -- "Cache Miss" --> D["Execute Multi-Tenant SQL Aggregation Query"] ::: cache
-    D --> E["Populate Cache Region & Return Telemetry Payload"] ::: cache
+    B -- "Cache Hit" --> C["⚡ Return Cached Telemetry DTO (Zero DB Latency)"]
+    B -- "Cache Miss" --> D["Execute Multi-Tenant SQL Aggregation Query"]
+    D --> E["Populate Cache Region & Return Telemetry Payload"]
+
+    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef cache fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef hit fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A req;
+    class B,D,E cache;
+    class C hit;
 ```
 
 ---
@@ -592,10 +650,13 @@ Eruscent equips department heads and platform operators with real-time academic 
 
 ```mermaid
 flowchart LR
-    classDef src fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef res fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    A["Department Session Logs"] --> B["Query Aggregator"] --> C["Department KPI Telemetry"]
 
-    A["Department Session Logs"] ::: src --> B["Query Aggregator"] ::: src --> C["Department KPI Telemetry"] ::: res
+    classDef src fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef res fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class A,B src;
+    class C res;
 ```
 
 ---
@@ -618,18 +679,21 @@ Eruscent uses an automated, containerized **GitHub Actions** CI/CD testing and v
 
 ```mermaid
 flowchart TD
-    classDef trigger fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
-    classDef job fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    A["Pull Request / Push to Main Branch"] --> B["Java CI Workflow (ci.yml)"]
+    A --> C["Security Audit Workflow (security-audit.yml)"]
 
-    A["Pull Request / Push to Main Branch"] ::: trigger --> B["Java CI Workflow (ci.yml)"] ::: job
-    A --> C["Security Audit Workflow (security-audit.yml)"] ::: job
+    B --> B1["• Spins up PostgreSQL 16 Service Container (pg_isready)"]
+    B --> B2["• Compiles Java 21 & Runs Unit Tests"]
 
-    B --> B1["• Spins up PostgreSQL 16 Service Container (pg_isready)"] ::: job
-    B --> B2["• Compiles Java 21 & Runs Unit Tests"] ::: job
+    C --> C1["• Runs npm audit --audit-level=high (Frontend)"]
+    C --> C2["• Runs mvn clean verify (Backend)"]
+    C --> C3["• Scheduled Weekly Midnight Audits (Cron: 0 0 * * 0)"]
 
-    C --> C1["• Runs npm audit --audit-level=high (Frontend)"] ::: job
-    C --> C2["• Runs mvn clean verify (Backend)"] ::: job
-    C --> C3["• Scheduled Weekly Midnight Audits (Cron: 0 0 * * 0)"] ::: job
+    classDef trigger fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff;
+    classDef job fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+
+    class A trigger;
+    class B,C,B1,B2,C1,C2,C3 job;
 ```
 
 ---
@@ -640,18 +704,22 @@ Eruscent complies with cloud-native 12-Factor Application principles through dyn
 
 ```mermaid
 flowchart TD
-    classDef root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
-    classDef dev fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
-    classDef prod fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    Root["SPRING ENVIRONMENT TIER SELECTION"] --> D["Development Profile (Local)"]
+    Root --> P["Production Profile (Railway / Cloud)"]
 
-    Root["SPRING ENVIRONMENT TIER SELECTION"] ::: root --> D["Development Profile (Local)"] ::: dev
-    Root --> P["Production Profile (Railway / Cloud)"] ::: prod
+    D --> D1["• Local PostgreSQL (strive_db)"]
+    D --> D2["• Mailtrap SMTP Sandbox"]
 
-    D --> D1["• Local PostgreSQL (strive_db)"] ::: dev
-    D --> D2["• Mailtrap SMTP Sandbox"] ::: dev
+    P --> P1["• Managed Cloud Postgres with SSL"]
+    P --> P2["• Enterprise SMTP Notification Gateway"]
 
-    P --> P1["• Managed Cloud Postgres with SSL"] ::: prod
-    P --> P2["• Enterprise SMTP Notification Gateway"] ::: prod
+    classDef root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#ffffff;
+    classDef dev fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef prod fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff;
+
+    class Root root;
+    class D,D1,D2 dev;
+    class P,P1,P2 prod;
 ```
 
 ---
@@ -662,9 +730,11 @@ Database structure, migrations, and development seeders are managed via **Flyway
 
 ```mermaid
 flowchart LR
-    classDef flyway fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
+    V1["V1__init_schema.sql<br/>• Core Entities & Indexes"] --> V2["V2__add_group_sessions.sql<br/>• Group Lobbies & Capacity"] --> V3["V3__add_user_roles.sql<br/>• Role Enums & Audit Signatures"]
 
-    V1["V1__init_schema.sql<br/>• Core Entities & Indexes"] ::: flyway --> V2["V2__add_group_sessions.sql<br/>• Group Lobbies & Capacity"] ::: flyway --> V3["V3__add_user_roles.sql<br/>• Role Enums & Audit Signatures"] ::: flyway
+    classDef flyway fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#ffffff;
+
+    class V1,V2,V3 flyway;
 ```
 
 ---
@@ -675,11 +745,13 @@ Eruscent automatically compiles its backend route contracts into an interactive 
 
 ```mermaid
 flowchart TD
-    classDef doc fill:#1e1b4b,stroke:#85ea2d,stroke-width:2px,color:#fff;
+    A["Spring Boot REST Controllers"] --> B["springdoc-openapi Annotation & Reflection Engine"]
+    B --> C["Interactive Swagger UI (/swagger-ui.html)"]
+    B --> D["OpenAPI 3.0 JSON Contract (raw-openapi.json)"]
 
-    A["Spring Boot REST Controllers"] ::: doc --> B["springdoc-openapi Annotation & Reflection Engine"] ::: doc
-    B --> C["Interactive Swagger UI (/swagger-ui.html)"] ::: doc
-    B --> D["OpenAPI 3.0 JSON Contract (raw-openapi.json)"] ::: doc
+    classDef doc fill:#1e1b4b,stroke:#85ea2d,stroke-width:2px,color:#ffffff;
+
+    class A,B,C,D doc;
 ```
 
 ---
