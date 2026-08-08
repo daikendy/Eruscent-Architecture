@@ -27,39 +27,60 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 ## 📋 Table of Contents
 
-* [PART I: EXECUTIVE OVERVIEW & SYSTEM BLUEPRINTS](#part-i-executive-overview--system-blueprints)
-  * [📌 1. Executive Summary & Core Multi-Tenant Architecture](#-1-executive-summary--core-multi-tenant-architecture)
-  * [🏗️ 2. High-Level System Architecture Diagram](#%EF%B8%8F-2-high-level-system-architecture-diagram)
-  * [💡 3. Architecture Strategy: Public Spec & Private Implementation](#-3-architecture-strategy-public-spec--private-implementation)
-* [PART II: CORE ENGINE PILLARS (THE HEAVYWEIGHT FEATURES)](#part-ii-core-engine-pillars-the-heavyweight-features)
-  * [🔐 4. Decoupled Identity, JWKS & JIT User Provisioning](#-4-decoupled-identity-jwks--jit-user-provisioning)
-  * [🌐 5. Dynamic Institutional Domain Gating & Allowlist Engine](#-5-dynamic-institutional-domain-gating--allowlist-engine)
-  * [📅 6. Dual Session Architecture & Schedule Conflict Engine](#-6-dual-session-architecture--schedule-conflict-engine)
-  * [⚡ 7. Concurrency Safety & Optimistic Locking Guard](#-7-concurrency-safety--optimistic-locking-guard)
-  * [🔎 8. Dynamic JPA Criteria API Search & Filtering Engine](#-8-dynamic-jpa-criteria-api-search--filtering-engine)
-  * [💬 9. Zero-Trust In-Session Peer Chat & Notification Radar](#-9-zero-trust-in-session-peer-chat--notification-radar)
-  * [⭐ 10. Verified Session Review & Math-Rounded Rating Engine](#-10-verified-session-review--math-rounded-rating-engine)
-  * [🔥 11. Timezone-Aware Gamification & Activity Streak Engine](#-11-timezone-aware-gamification--activity-streak-engine)
-* [PART III: SECURITY, RESILIENCE & EXCEPTION CONTRACTS](#part-iii-security-resilience--exception-contracts)
-  * [🔒 12. OWASP-Hardened Security & Multi-Subdomain CORS Matrix](#-12-owasp-hardened-security--multi-subdomain-cors-matrix)
-  * [🛡️ 13. Rate Limiting & Denial-of-Service (DoS) Protection Matrix](#%EF%B8%8F-13-rate-limiting--denial-of-service-dos-protection-matrix)
-  * [🔄 14. Resilient Client Interceptor & Automatic Retry Engine](#-14-resilient-client-interceptor--automatic-retry-engine)
-  * [📐 15. Uniform Enterprise Exception Contract & ISO-8601 Serialization](#-15-uniform-enterprise-exception-contract--iso-8601-serialization)
-* [PART IV: TELEMETRY, PERFORMANCE & BACKGROUND ENGINES](#part-iv-telemetry-performance--background-engines)
-  * [⚙️ 16. High-Concurrency Asynchronous & Scheduled Engine](#%EF%B8%8F-16-high-concurrency-asynchronous--scheduled-engine)
-  * [🚀 17. In-Memory Telemetry & Treemap Caching Engine (`@Cacheable`)](#-17-in-memory-telemetry--treemap-caching-engine-cacheable)
-  * [📈 18. Institutional Analytics & Departmental Bottleneck Telemetry](#-18-institutional-analytics--departmental-bottleneck-telemetry)
-  * [🪵 19. Production Structured Telemetry & Observability Pipeline](#-19-production-structured-telemetry--observability-pipeline)
-* [PART V: DEVOPS, SCHEMA & REFERENCE SCHEMAS](#part-v-devops-schema--reference-schemas)
-  * [🛠️ 20. Automated CI/CD Pipeline & Full-Stack DevOps Architecture](#%EF%B8%8F-20-automated-cicd-pipeline--full-stack-devops-architecture)
-  * [🏗️ 21. Environment Profile Isolation & 12-Factor Production Tiering](#%EF%B8%8F-21-environment-profile-isolation--12-factor-production-tiering)
-  * [🐘 22. Versioned Schema Evolution & Automated Seeder Engine](#-22-versioned-schema-evolution--automated-seeder-engine)
-  * [📖 23. OpenAPI 3.0 & Interactive Swagger UI Pipeline](#-23-openapi-30--interactive-swagger-ui-pipeline)
-  * [📊 24. Entity-Relationship & Data Model Overview](#-24-entity-relationship--data-model-overview)
-  * [🎯 25. Feature Capability & System Architecture Mapping](#-25-feature-capability--system-architecture-mapping)
-  * [🗺️ 26. High-Level API Domain Map](#%EF%B8%8F-26-high-level-api-domain-map)
-  * [📱 27. Responsive Frontend & Mobile Layout Architecture](#-27-responsive-frontend--mobile-layout-architecture)
-  * [🛠️ 28. Technology Stack Breakdown](#%EF%B8%8F-28-technology-stack-breakdown)
+<br/>
+
+### **PART I: EXECUTIVE OVERVIEW & SYSTEM BLUEPRINTS**
+
+* 📌 [**1. Executive Summary & Core Multi-Tenant Architecture**](#-1-executive-summary--core-multi-tenant-architecture)
+* 🏗️ [**2. High-Level System Architecture Diagram**](#%EF%B8%8F-2-high-level-system-architecture-diagram)
+* 💡 [**3. Architecture Strategy: Public Spec & Private Implementation**](#-3-architecture-strategy-public-spec--private-implementation)
+
+<br/>
+
+### **PART II: CORE ENGINE PILLARS (THE HEAVYWEIGHT FEATURES)**
+
+* 🔐 [**4. Decoupled Identity, JWKS & JIT User Provisioning**](#-4-decoupled-identity-jwks--jit-user-provisioning)
+* 🌐 [**5. Dynamic Institutional Domain Gating & Allowlist Engine**](#-5-dynamic-institutional-domain-gating--allowlist-engine)
+* 📅 [**6. Dual Session Architecture & Schedule Conflict Engine**](#-6-dual-session-architecture--schedule-conflict-engine)
+* ⚡ [**7. Concurrency Safety & Optimistic Locking Guard**](#-7-concurrency-safety--optimistic-locking-guard)
+* 🔎 [**8. Dynamic JPA Criteria API Search & Filtering Engine**](#-8-dynamic-jpa-criteria-api-search--filtering-engine)
+* 💬 [**9. Zero-Trust In-Session Peer Chat & Notification Radar**](#-9-zero-trust-in-session-peer-chat--notification-radar)
+* ⭐ [**10. Verified Session Review & Math-Rounded Rating Engine**](#-10-verified-session-review--math-rounded-rating-engine)
+* 🔥 [**11. Timezone-Aware Gamification & Activity Streak Engine**](#-11-timezone-aware-gamification--activity-streak-engine)
+
+<br/>
+
+### **PART III: SECURITY, RESILIENCE & EXCEPTION CONTRACTS**
+
+* 🔒 [**12. OWASP-Hardened Security & Multi-Subdomain CORS Matrix**](#-12-owasp-hardened-security--multi-subdomain-cors-matrix)
+* 🛡️ [**13. Rate Limiting & Denial-of-Service (DoS) Protection Matrix**](#%EF%B8%8F-13-rate-limiting--denial-of-service-dos-protection-matrix)
+* 🔄 [**14. Resilient Client Interceptor & Automatic Retry Engine**](#-14-resilient-client-interceptor--automatic-retry-engine)
+* 📐 [**15. Uniform Enterprise Exception Contract & ISO-8601 Serialization**](#-15-uniform-enterprise-exception-contract--iso-8601-serialization)
+
+<br/>
+
+### **PART IV: TELEMETRY, PERFORMANCE & BACKGROUND ENGINES**
+
+* ⚙️ [**16. High-Concurrency Asynchronous & Scheduled Engine**](#%EF%B8%8F-16-high-concurrency-asynchronous--scheduled-engine)
+* 🚀 [**17. In-Memory Telemetry & Treemap Caching Engine (`@Cacheable`)**](#-17-in-memory-telemetry--treemap-caching-engine-cacheable)
+* 📈 [**18. Institutional Analytics & Departmental Bottleneck Telemetry**](#-18-institutional-analytics--departmental-bottleneck-telemetry)
+* 🪵 [**19. Production Structured Telemetry & Observability Pipeline**](#-19-production-structured-telemetry--observability-pipeline)
+
+<br/>
+
+### **PART V: DEVOPS, SCHEMA & REFERENCE SCHEMAS**
+
+* 🛠️ [**20. Automated CI/CD Pipeline & Full-Stack DevOps Architecture**](#%EF%B8%8F-20-automated-cicd-pipeline--full-stack-devops-architecture)
+* 🏗️ [**21. Environment Profile Isolation & 12-Factor Production Tiering**](#%EF%B8%8F-21-environment-profile-isolation--12-factor-production-tiering)
+* 🐘 [**22. Versioned Schema Evolution & Automated Seeder Engine**](#-22-versioned-schema-evolution--automated-seeder-engine)
+* 📖 [**23. OpenAPI 3.0 & Interactive Swagger UI Pipeline**](#-23-openapi-30--interactive-swagger-ui-pipeline)
+* 📊 [**24. Entity-Relationship & Data Model Overview**](#-24-entity-relationship--data-model-overview)
+* 🎯 [**25. Feature Capability & System Architecture Mapping**](#-25-feature-capability--system-architecture-mapping)
+* 🗺️ [**26. High-Level API Domain Map**](#%EF%B8%8F-26-high-level-api-domain-map)
+* 📱 [**27. Responsive Frontend & Mobile Layout Architecture**](#-27-responsive-frontend--mobile-layout-architecture)
+* 🛠️ [**28. Technology Stack Breakdown**](#%EF%B8%8F-28-technology-stack-breakdown)
+
+<br/>
 
 ---
 
@@ -69,30 +90,30 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 **ERUSCENT** is an institutional peer tutoring and academic telemetry platform designed to bridge higher-education institutions with their academic communities (students, tutors, department heads, and platform administrators).
 
-<div align="center">
+```mermaid
+flowchart TD
+    classDef univ fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef campus fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef dept fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#ffffff,font-weight:bold;
+    classDef user fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#ffffff,font-weight:bold;
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    ERUSCENT MULTI-TENANT HUD                    │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                       UNIVERSITIES                        │  │
-│  └─────────────────────────────┬─────────────────────────────┘  │
-│                                │                                │
-│  ┌─────────────────────────────┴─────────────────────────────┐  │
-│  │                         CAMPUSES                          │  │
-│  └─────────────────────────────┬─────────────────────────────┘  │
-│                                │                                │
-│  ┌─────────────────────────────┴─────────────────────────────┐  │
-│  │                       DEPARTMENTS                         │  │
-│  └──────────────┬─────────────────────────────┬──────────────┘  │
-│                 │                             │                 │
-│  ┌──────────────┴───────────┐   ┌─────────────┴───────────┐     │
-│  │    STUDENT PRINCIPALS    │   │     TUTOR PRINCIPALS    │     │
-│  └──────────────────────────┘   └─────────────────────────┘     │
-└─────────────────────────────────────────────────────────────────┘
+    subgraph HUD ["🏛️ ERUSCENT MULTI-TENANT INSTITUTIONAL HIERARCHY"]
+        direction TD
+        U["🏫 UNIVERSITIES (Tenant Root Isolation)"] ::: univ
+        C["🏬 CAMPUSES (Domain-Locked Operations)"] ::: campus
+        D["🔬 DEPARTMENTS (Academic Scoping & Telemetry)"] ::: dept
+        
+        subgraph Principals ["👥 USER PRINCIPALS"]
+            S["🎓 STUDENT PRINCIPALS"] ::: user
+            T["🧑‍🏫 TUTOR PRINCIPALS"] ::: user
+        end
+    end
+
+    U --> C
+    C --> D
+    D --> S
+    D --> T
 ```
-
-</div>
 
 ### Core Architectural Pillars
 
@@ -117,26 +138,32 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer ["Client Layer (Next.js 16 App Router)"]
-        UI_Student["🎓 Student Marketplace & Dashboard"]
-        UI_Tutor["🧑‍🏫 Tutor Management & Analytics"]
-        UI_Admin["🛡️ Department Admin Portal"]
-        UI_Super["👑 Super Admin Telemetry HUD"]
-        Axios_Client["⚡ Resilient Axios Client (Retry Interceptor)"]
+    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef auth fill:#581c87,stroke:#c084fc,stroke-width:2px,color:#fff;
+    classDef backend fill:#065f46,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef devops fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#fff;
+    classDef data fill:#1e3a8a,stroke:#60a5fa,stroke-width:2px,color:#fff;
+
+    subgraph ClientLayer ["📱 Client Layer (Next.js 16 App Router)"]
+        UI_Student["🎓 Student Marketplace & Dashboard"] ::: client
+        UI_Tutor["🧑‍🏫 Tutor Management & Analytics"] ::: client
+        UI_Admin["🛡️ Department Admin Portal"] ::: client
+        UI_Super["👑 Super Admin Telemetry HUD"] ::: client
+        Axios_Client["⚡ Resilient Axios Client (Retry Interceptor)"] ::: client
     end
 
-    subgraph AuthLayer ["Identity & JWKS Provider"]
-        Clerk_IdP["🔐 Clerk Identity Provider & Avatar CDN"]
-        JWKS_Uri["🔑 Public JWKS Keys Endpoint"]
+    subgraph AuthLayer ["🔐 Identity & JWKS Provider"]
+        Clerk_IdP["🔐 Clerk Identity Provider & Avatar CDN"] ::: auth
+        JWKS_Uri["🔑 Public JWKS Keys Endpoint"] ::: auth
     end
 
-    subgraph BackendLayer ["Backend Core — Spring Boot 3 Engine"]
-        Sec_Filter["🛡️ Spring Security Filter Chain"]
-        Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"]
-        Jwt_Decoder["jwtDecoder (NimbusJWKSet)"]
-        JIT_Engine["🔄 JIT User Sync & Identity Healing"]
-        Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"]
-        Cache_Manager["🚀 Spring @Cacheable Layer"]
+    subgraph BackendLayer ["⚙️ Backend Core — Spring Boot 3 Engine"]
+        Sec_Filter["🛡️ Spring Security Filter Chain"] ::: backend
+        Rate_Limiter["⚡ Bucket4j Rate Limiting Interceptor"] ::: backend
+        Jwt_Decoder["jwtDecoder (NimbusJWKSet)"] ::: backend
+        JIT_Engine["🔄 JIT User Sync & Identity Healing"] ::: backend
+        Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"] ::: backend
+        Cache_Manager["🚀 Spring @Cacheable Layer"] ::: backend
         
         subgraph Controllers ["REST API Domain Controllers"]
             Ctrl_Auth["Auth & Domain Gating"]
@@ -162,21 +189,21 @@ flowchart TB
         end
 
         subgraph BackgroundWorkers ["Background Execution Engine"]
-            Audit_Pool["🪵 auditExecutor (2 Core / 5 Max / 100 Queue)"]
-            Task_Pool["📧 taskExecutor (5 Core / 10 Max / 500 Queue)"]
-            Nightly_Cron["⏰ DatabaseCleanupService (Daily @ 2:00 AM)"]
-            Ghost_Watchdog["🤖 GroupSessionScheduler (Hourly Radar)"]
+            Audit_Pool["🪵 auditExecutor Pool"]
+            Task_Pool["📧 taskExecutor Pool"]
+            Nightly_Cron["⏰ DatabaseCleanupService"]
+            Ghost_Watchdog["🤖 GroupSessionScheduler"]
         end
     end
 
-    subgraph DevOpsLayer ["DevOps & Automated CI/CD"]
-        GHA_CI["🛠️ GitHub Actions (Java 21 + Live Postgres 16 Container)"]
-        GHA_Audit["🛡️ Weekly Dependency Security Audit Cron"]
+    subgraph DevOpsLayer ["🛠️ DevOps & Automated CI/CD"]
+        GHA_CI["🛠️ GitHub Actions (Java 21 + Live Postgres 16 Container)"] ::: devops
+        GHA_Audit["🛡️ Weekly Dependency Security Audit Cron"] ::: devops
     end
 
-    subgraph DataLayer ["Persistence & External Services"]
-        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
-        Mail_Provider["📨 SMTP / JavaMailSender (Mailtrap / Production Provider)"]
+    subgraph DataLayer ["🐘 Persistence & External Services"]
+        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")] ::: data
+        Mail_Provider["📨 SMTP / JavaMailSender"] ::: data
     end
 
     ClientLayer --> Axios_Client
@@ -209,24 +236,25 @@ flowchart TB
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
-```
-       ┌─────────────────────────────────────────────────────────────────┐
-       │                PUBLIC SPECIFICATION REPOSITORY                  │
-       │                   (GitHub: Public Repository)                   │
-       │  • Architectural Blueprints & System Design Flowcharts          │
-       │  • OpenAPI 3.0 Route Contracts & Domain Mapping                 │
-       │  • Entity-Relationship Diagrams (ERD)                           │
-       │  • Security Audit Controls & Rate Limiting Matrices             │
-       └──────────────────────────────┬────────────────────────────────┘
-                                        │
-                                        ▼
-       ┌─────────────────────────────────────────────────────────────────┐
-       │             PRIVATE IMPLEMENTATION SOURCE CODE BASE             │
-       │                  (GitHub: Private Repository)                   │
-       │  • Proprietary Java 21 / Spring Boot 3 Engine                   │
-       │  • Next.js 16 App Router Codebase                               │
-       │  • Production Database Migrations & Environment Credentials     │
-       └─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    classDef pub fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef priv fill:#0f172a,stroke:#a855f7,stroke-width:2px,color:#fff,font-weight:bold;
+
+    subgraph PublicRepo ["🌐 PUBLIC SPECIFICATION REPOSITORY (GitHub Public)"]
+        P1["• Architectural Blueprints & Flowcharts"] ::: pub
+        P2["• OpenAPI 3.0 Route Contracts & Domain Maps"] ::: pub
+        P3["• Entity-Relationship Diagrams (ERD)"] ::: pub
+        P4["• Security Audit Controls & Rate Limiting Matrices"] ::: pub
+    end
+
+    subgraph PrivateRepo ["🔒 PRIVATE IMPLEMENTATION REPOSITORY (GitHub Private)"]
+        R1["• Proprietary Java 21 / Spring Boot 3 Core Engine"] ::: priv
+        R2["• Next.js 16 App Router Frontend Codebase"] ::: priv
+        R3["• Production Flyway Migrations & Cloud Credentials"] ::: priv
+    end
+
+    PublicRepo ==>|Defines System Architecture Contract| PrivateRepo
 ```
 
 ---
@@ -237,22 +265,21 @@ Designed by **Eruscent**, this project adopts an **"Open Architecture Specificat
 
 Eruscent decouples identity authentication from application authorization by leveraging stateless JWT tokens verified against remote JWKS public keys.
 
-```
-Incoming Request (Bearer JWT)
-         │
-         ▼
-[ JwtDecoder (NimbusJwtDecoder with JwkSetUri) ]
-         │
-         ▼
-[ Extract Clerk Principal ID (jwt.getSubject()) ]
-         │
-         ├──► [ User Found in DB ] ────► Identity Healing (Sync Name & Profile Picture)
-         │                                       │
-         └──► [ User Not Found ] ────► Just-In-Time (JIT) Auto-Provisioning
-                                                 │
-                                                 ▼
-                             [ Map Granted Authorities & Dual Roles ]
-                             (ROLE_STUDENT, ROLE_TUTOR, ROLE_ADMIN)
+```mermaid
+flowchart TD
+    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef act fill:#701a75,stroke:#f0abfc,stroke-width:2px,color:#fff;
+
+    A["Incoming Request (Bearer JWT)"] ::: step --> B["JwtDecoder (NimbusJwtDecoder with JwkSetUri)"] ::: step
+    B --> C["Extract Clerk Principal ID (jwt.getSubject())"] ::: step
+    C --> D{"User Found in DB?"} ::: step
+    
+    D -- "YES" --> E["Identity Self-Healing (Sync Name & Profile Picture)"] ::: pass
+    D -- "NO" --> F["Just-In-Time (JIT) Auto-Provisioning"] ::: act
+    
+    E --> G["Map Granted Authorities & Dual Roles (ROLE_STUDENT, ROLE_TUTOR, ROLE_ADMIN)"] ::: pass
+    F --> G
 ```
 
 ### Identity Architecture Features
@@ -268,30 +295,23 @@ Incoming Request (Bearer JWT)
 
 To maintain strict institutional boundaries, Eruscent incorporates a **3-tier domain validation strategy** managed by `EmailDomainService`:
 
-```
-User Registration Request (email)
-         │
-         ▼
-[ 1. Check Authoritative DB Table (allowed_email_domains) ]
-         │
-         ├──► Active DB Domains Exist? ──► [ Match Email Domain against DB Entries ]
-         │                                         ├── Allowed ──► Proceed
-         │                                         └── Denied  ──► Block Registration
-         │
-         └──► DB Table Empty? (Bootstrap State)
-                     │
-                     ▼
-        [ 2. Fallback to Env Property (app.registration.allowed-domains) ]
-                     │
-                     ├── Env Configured? ──► [ Match Email Domain against Env List ]
-                     │
-                     └── Env Blank? ─────► [ 3. Default Fallback: DENY ALL ]
-```
+```mermaid
+flowchart TD
+    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
 
-### Key Domain Guard Controls
-
-* **Zero-Downtime Domain Management**: Super Admins can dynamically add, activate, deactivate, or delete permitted university email domains (e.g., `@dlsu.edu.ph`, `@admu.edu.ph`) with zero server redeployment.
-* **Fail-Secure Default**: If both the database allowlist and environment fallbacks are unconfigured, registration automatically fails secure (`log.warn("[DOMAIN GUARD] Registration blocked")`).
+    A["User Registration Request (email)"] ::: check --> B["1. Check Authoritative DB Table (allowed_email_domains)"] ::: check
+    B --> C{"Active DB Domains Exist?"} ::: check
+    
+    C -- "YES" --> D["Match Email Domain against DB Entries"] ::: check
+    D -- "Match" --> E["✅ Allow Registration"] ::: ok
+    D -- "No Match" --> F["❌ Block Registration"] ::: deny
+    
+    C -- "NO (Bootstrap)" --> G["2. Fallback to Env Property (app.registration.allowed-domains)"] ::: check
+    G -- "Env Set & Match" --> E
+    G -- "Env Blank / Unconfigured" --> H["3. Default Fallback: DENY ALL"] ::: deny
+```
 
 ---
 
@@ -299,26 +319,25 @@ User Registration Request (email)
 
 Eruscent implements two distinct tutoring session modes with real-time schedule conflict resolution:
 
-```
-                            ┌──────────────────────────────────────────┐
-                            │        DUAL TUTORING SESSION MODES       │
-                            └────────────────────┬─────────────────────┘
-                                                 │
-                       ┌─────────────────────────┴─────────────────────────┐
-                       ▼                                                   ▼
-         [ 1-on-1 Private Sessions ]                         [ Group Session Lobbies ]
-         • Calendar time slot booking                        • Multi-student group lobby
-         • Direct tutor acceptance/rejection                 • Locked group discount pricing (50% multiplier)
-         • Single student reservation                        • Dynamic capacity bounds (enrolledCount vs maxCapacity)
-         • Pending auto-expiry (15 mins)                     • Hourly low-attendance watchdog alert
-```
+```mermaid
+flowchart TD
+    classDef mode fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
+    classDef feature fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
 
-### Schedule Conflict & Business Controls
+    Root["🗓️ DUAL TUTORING SESSION ARCHITECTURE"] ::: mode
+    Root --> M1["1-on-1 Private Sessions"] ::: mode
+    Root --> M2["Group Session Lobbies"] ::: mode
 
-1. **Overlapping Collision Guard**: When a tutor creates a group lobby or accepts a 1:1 request, `groupSessionRepository.hasOverlappingSessions()` and `tutoringSessionRepository.hasOverlappingSessions()` check for time collisions across both modes.
-2. **Automatic Time Slot Cleanup**: Creating a group class automatically purges unbooked individual time slots (`deleteUnbookedTimeSlots`) falling within the class window.
-3. **Abuse Protection & Cancellation Windows**: Students and tutors cannot cancel sessions or drop out of group classes within 24 hours of the scheduled start time (`app.business.cancellation-window-hours=24`).
-4. **Group Pricing Multipliers**: Group class ticket prices are automatically derived from the tutor's base hourly rate multiplied by a configurable discount factor (`app.business.pricing.group-multiplier=0.5`).
+    M1 --> F1["• Calendar time slot booking"] ::: feature
+    M1 --> F2["• Direct tutor acceptance / rejection"] ::: feature
+    M1 --> F3["• Single student reservation"] ::: feature
+    M1 --> F4["• Pending auto-expiry (15 mins)"] ::: feature
+
+    M2 --> G1["• Multi-student group lobby"] ::: feature
+    M2 --> G2["• Locked group discount pricing (50% multiplier)"] ::: feature
+    M2 --> G3["• Dynamic capacity bounds (enrolled vs max)"] ::: feature
+    M2 --> G4["• Hourly low-attendance watchdog alert"] ::: feature
+```
 
 ---
 
@@ -326,24 +345,22 @@ Eruscent implements two distinct tutoring session modes with real-time schedule 
 
 During high-demand registration windows or popular group lobby launches, Eruscent prevents database race conditions using **JPA Optimistic Locking** (`ObjectOptimisticLockingFailureException`):
 
-```
-         Student A (Enrolls in Lobby) ───┐
-                                          ├──► Simultaneous Database Mutation Attempt
-         Student B (Enrolls in Lobby) ───┘
-                                          │
-                                          ▼
-                         [ JPA Optimistic Locking Check ]
-                                          │
-                         ├── First Transaction Succeeds (Version Updated)
-                         └── Second Transaction Fails (OptimisticLockingFailureException)
-                                          │
-                                          ▼
-                         [ GlobalExceptionHandler Trap ]
-                         Returns HTTP 409 Conflict: "Record modified. Please refresh."
-```
+```mermaid
+flowchart TD
+    classDef tx fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
+    classDef fail fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
 
-* **Zero Lock Overhead**: Avoids heavy pessimistic database row locks, allowing read operations to run unhindered while safeguarding state modifications.
-* **Friendly Graceful Fallbacks**: Trapped by `GlobalExceptionHandler` to output a structured HTTP 409 Conflict response without corrupting session capacity counts.
+    A["Student A (Enrolls in Lobby)"] ::: tx --> C["Simultaneous Database Mutation Attempt"] ::: tx
+    B["Student B (Enrolls in Lobby)"] ::: tx --> C
+    
+    C --> D["JPA Optimistic Locking Check (@Version)"] ::: tx
+    
+    D --> E["1st Transaction Succeeds (Version Incremented)"] ::: ok
+    D --> F["2nd Transaction Fails (OptimisticLockingFailureException)"] ::: fail
+    
+    F --> G["GlobalExceptionHandler Traps & Returns HTTP 409 Conflict"] ::: fail
+```
 
 ---
 
@@ -351,26 +368,21 @@ During high-demand registration windows or popular group lobby launches, Eruscen
 
 The tutor marketplace directory uses a dynamic query specification builder (`TutorProfileSpecifications.java`) built on Spring Data JPA Criteria API:
 
-```
-Search Request (campusId, searchTerm, maxPrice, minRating)
-         │
-         ▼
-[ CriteriaBuilder Predicate Assembly ]
-         │
-         ├── campusId Filter      ──► Join User -> Match Campus UUID
-         ├── Mandatory Guard     ──► Require User.isVerified = true
-         ├── Search Term Match   ──► OR (Subject Name, Course Code, Full Name, Bio)
-         ├── Budget Filter       ──► LessThanOrEqualTo(hourlyRate, maxPrice)
-         └── Quality Threshold   ──► GreaterThanOrEqualTo(rating, minRating)
-         │
-         ▼
-[ Execute Deduplicated Distinct Query (query.distinct(true)) ]
-```
+```mermaid
+flowchart TD
+    classDef spec fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
+    classDef pred fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
 
-### Key Search Capabilities
-
-* **Multi-Entity Field Search**: Performs case-insensitive wildcard searches across tutor names, bio text, subject titles, and course codes (e.g. searching `"CS101"` or `"Linear Algebra"`).
-* **Safe Distinct Join Deduplication**: Enforces `query.distinct(true)` to prevent duplicate tutor profile results when joining across multiple subjects.
+    A["Search Request (campusId, searchTerm, maxPrice, minRating)"] ::: spec --> B["CriteriaBuilder Predicate Assembly"] ::: spec
+    
+    B --> P1["• campusId Filter (Join User -> Campus UUID)"] ::: pred
+    B --> P2["• Mandatory Guard (User.isVerified = true)"] ::: pred
+    B --> P3["• Search Term Match (OR Name, Bio, Subject, Course Code)"] ::: pred
+    B --> P4["• Budget Filter (hourlyRate <= maxPrice)"] ::: pred
+    B --> P5["• Quality Threshold (rating >= minRating)"] ::: pred
+    
+    P1 & P2 & P3 & P4 & P5 --> C["Execute Deduplicated Distinct Query (query.distinct(true))"] ::: spec
+```
 
 ---
 
@@ -378,22 +390,23 @@ Search Request (campusId, searchTerm, maxPrice, minRating)
 
 Eruscent provides encrypted, participant-restricted peer messaging (`MessageService.java`) for active sessions:
 
-```
-Chat Access Request (referenceId, referenceType, currentUser)
-         │
-         ▼
-[ Access Guard Bouncer (validateUserAccess) ]
-         │
-         ├── 1:1 Private Session  ──► Enforce principal IS Student OR Tutor
-         └── Group Session Lobby  ──► Enforce principal IS Tutor OR Active Enrolled Student
-                                         │
-                                         └── Enrollment Canceled? ──► DENY (Access Revoked)
-```
+```mermaid
+flowchart TD
+    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef check fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef deny fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-### Chat & Notification Features
+    A["Chat Access Request (referenceId, referenceType, currentUser)"] ::: req --> B["Access Guard Bouncer (validateUserAccess)"] ::: check
+    
+    B -- "PRIVATE" --> C{"Principal is Student OR Tutor?"} ::: check
+    C -- "YES" --> D["Grant Access & Fetch Chat History"] ::: pass
+    C -- "NO" --> E["❌ Access Denied"] ::: deny
 
-* **Dynamic Access Revocation**: Instantly revokes chat read/write permissions if a student drops out of a group lobby or if a session is canceled.
-* **Batch Notification Radar (`getNotifications`)**: Batch-queries the latest message timestamps across all active student/tutor session memberships in a single query, delivering unread indicators without N+1 query overhead.
+    B -- "GROUP" --> F{"Principal is Tutor OR Active Enrolled Student?"} ::: check
+    F -- "YES & Active" --> D
+    F -- "Canceled Enrollment" --> G["❌ Access Revoked"] ::: deny
+```
 
 ---
 
@@ -401,30 +414,17 @@ Chat Access Request (referenceId, referenceType, currentUser)
 
 Tutor review submission and rating aggregation are governed by strict verification pipelines (`ReviewService.java`):
 
-```
-Review Submission Request (rating, comment, sessionId/groupSessionId)
-         │
-         ▼
-[ 1. Verify Session Participation & Status = COMPLETED ]
-         │
-         ▼
-[ 2. Anti-Self-Review Guard (Ensure Student ID != Tutor ID) ]
-         │
-         ▼
-[ 3. Duplicate Review Check (existsBySessionId) ]
-         │
-         ▼
-[ 4. Save Review & Recalculate Aggregate Rating ]
-         │
-         ▼
-[ Math.round(newAverage * 10.0) / 10.0 ──► Save TutorProfile ]
-```
+```mermaid
+flowchart TD
+    classDef step fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef pass fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-### Rating Pipeline Controls
-
-* **Participation Verification**: Reviews are restricted strictly to students who participated in an **officially COMPLETED** 1:1 or group session (`Security Breach`).
-* **Anti-Fraud Controls**: Prevents self-reviews (`Self-Review Blocked`) and blocks duplicate review submissions per session.
-* **Rounded Aggregation**: Automatically recalculates the tutor's aggregate rating upon review submission and rounds to 1 decimal place.
+    A["Review Submission Request (rating, comment, sessionId/groupSessionId)"] ::: step --> B["1. Verify Session Participation & Status = COMPLETED"] ::: step
+    B --> C["2. Anti-Self-Review Guard (Ensure Student ID != Tutor ID)"] ::: step
+    C --> D["3. Duplicate Review Check (existsBySessionId)"] ::: step
+    D --> E["4. Save Review & Recalculate Aggregate Rating"] ::: step
+    E --> F["Math.round(newAverage * 10.0) / 10.0 ──► Update TutorProfile"] ::: pass
+```
 
 ---
 
@@ -432,27 +432,20 @@ Review Submission Request (rating, comment, sessionId/groupSessionId)
 
 To encourage consistent peer learning, Eruscent tracks daily activity streaks for both students and tutors (`updateStreak` in `GroupSessionService` & `TutoringSessionService`).
 
-```
-Session Completed Event
-         │
-         ▼
-[ Extract User Preference Timezone (e.g., "Asia/Manila", "America/New_York") ]
-         │
-         ▼
-[ Convert UTC Timestamp to User ZonedDateTime ]
-         │
-         ▼
-[ Compare Local Date against Last Streak Date ]
-         │
-         ├── Last Date = Yesterday (todayLocal - 1)  ──► Streak Count++
-         ├── Last Date = Today (Same Local Day)      ──► Maintain Current Streak
-         └── Last Date < Yesterday (Missed Day)      ──► Reset Streak Count to 1
-```
+```mermaid
+flowchart TD
+    classDef event fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef math fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef act fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-### Gamification Features
-
-* **Timezone Precision**: Streak boundaries are computed against each user's declared timezone (`user.getTimezone()`) rather than UTC, preventing unfair streak resets across different global regions.
-* **Dual Participant Streaks**: Completing a group or 1:1 session updates the streak counters for both the tutor and all attending students simultaneously.
+    A["Session Completed Event"] ::: event --> B["Extract User Timezone (e.g. 'Asia/Manila', 'America/New_York')"] ::: math
+    B --> C["Convert UTC Timestamp to User ZonedDateTime"] ::: math
+    C --> D{"Compare Local Date vs Last Streak Date"} ::: math
+    
+    D -- "Yesterday (todayLocal - 1)" --> E["🔥 Increment Streak Count++"] ::: act
+    D -- "Today (Same Local Day)" --> F["Maintain Current Streak"] ::: act
+    D -- "< Yesterday (Missed Day)" --> G["Reset Streak Count to 1"] ::: math
+```
 
 ---
 
@@ -462,46 +455,16 @@ Session Completed Event
 
 Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities and cross-origin attacks.
 
-```
-       ┌─────────────────────────────────────────────────────────────┐
-       │                   AUDIT EVENT GENERATED                     │
-       └──────────────────────────────┬──────────────────────────────┘
-                                      │
-                                      ▼
-       ┌─────────────────────────────────────────────────────────────┐
-       │              1. PII & Secret Scrubbing                      │
-       │     (Redacts Passwords, Tokens, API Keys, and Emails)       │
-       └──────────────────────────────┬──────────────────────────────┘
-                                      │
-                                      ▼
-       ┌─────────────────────────────────────────────────────────────┐
-       │         2. Log Forging & XSS Sanitization                   │
-       │     (CRLF Removal & HTML Escaping via HtmlUtils)            │
-       └──────────────────────────────┬──────────────────────────────┘
-                                      │
-                                      ▼
-       ┌─────────────────────────────────────────────────────────────┐
-       │      3. HMAC-SHA256 Cryptographic Signature Generation      │
-       │     sign(userId, action, details, timestamp, auditSecret)   │
-       └──────────────────────────────┬──────────────────────────────┘
-                                      │
-                                      ▼
-       ┌─────────────────────────────────────────────────────────────┐
-       │         4. Asynchronous Database Persistence                │
-       └─────────────────────────────────────────────────────────────┘
-```
+```mermaid
+flowchart TD
+    classDef sec fill:#1e1b4b,stroke:#c084fc,stroke-width:2px,color:#fff;
+    classDef act fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
 
-### Security & CORS Controls
-
-* **Multi-Subdomain CORS Security Matrix (`SecurityConfig.java`)**: Rather than using dangerous wildcard `*` origins, Eruscent uses strict pattern matching (`https://eruscent.com` and `https://*.eruscent.com`), explicit header allowlists (`Authorization`, `Content-Type`, `Accept`, `X-Requested-With`, `Cache-Control`), and exposed headers.
-* **Tamper-Evident Digital Signatures**: Every audit record saved via `AuditEventListener` contains an `HMAC-SHA256` signature computed over `userId|action|details|timestamp` using an immutable server key.
-* **PII & Credential Scrubbing**: `AuditSecurityUtils` applies regex masking to strip passwords, secret keys, bearer tokens, and email addresses prior to log persistence.
-* **Insecure Direct Object Reference (IDOR) Isolation**: Database queries for session management, time slots, and reviews enforce principal ownership checks (`WHERE s.student.id = :userId OR s.tutor.user.id = :userId`).
-* **Security Response Headers**:
-  * `Strict-Transport-Security` (HSTS): `max-age=31536000; includeSubDomains`
-  * `X-Frame-Options`: `DENY`
-  * `Referrer-Policy`: `strict-origin-when-cross-origin`
-* **Zero Mass Assignment**: Incoming request payloads map exclusively to validated DTOs, prohibiting client-side entity field tampering.
+    A["AUDIT EVENT GENERATED"] ::: sec --> B["1. PII & Secret Scrubbing (Regex Redaction)"] ::: act
+    B --> C["2. Log Forging & XSS Sanitization (CRLF & HtmlUtils)"] ::: act
+    C --> D["3. HMAC-SHA256 Digital Signature Generation"] ::: act
+    D --> E["4. Asynchronous DB Persistence (auditExecutor)"] ::: sec
+```
 
 ---
 
@@ -516,41 +479,27 @@ Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 | **State Mutation Profile** | All state-modifying requests (`POST`, `PUT`, `DELETE`, `PATCH`) | **60 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
 | **Read Bypass** | All `GET` and `OPTIONS` pre-flight requests | **Unlimited / Unthrottled** | Bypass Rule | Allowed |
 
-### Reverse-Proxy Aware IP Extraction
-
-To prevent IP spoofing attacks via client-supplied headers, `RateLimitInterceptor` parses the `X-Forwarded-For` header chain and extracts the **last IP address** (the address appended by trusted reverse proxies such as Railway/Cloudflare) rather than trusting client-injected positions.
-
 ---
 
 ## 🔄 14. Resilient Client Interceptor & Automatic Retry Engine
 
 The Next.js frontend client (`apiClient.ts`) is fortified with an intelligent HTTP resilience pipeline built on Axios:
 
-```
-Client API Call (apiClient)
-         │
-         ▼
-[ 1. Bearer Token Async Guard (Polls Clerk readiness) ]
-         │
-         ▼
-[ 2. HTTP Request Execution ]
-         │
-         ├──► Success (200 OK) ──► Return Payload
-         │
-         └──► Request Fails (Transient Error: 502, 503, 504, 429, Timeout)
-                     │
-                     ▼
-        [ 3. Exponential Backoff Retry (Max 2 Retries, 1s Delay) ]
-                     │
-                     ├── Retry Succeeds ──► Resolve Request
-                     └── Retries Exhausted ──► Extract Structured Error Message
-```
+```mermaid
+flowchart TD
+    classDef client fill:#0369a1,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef retry fill:#9a3412,stroke:#fb923c,stroke-width:2px,color:#fff;
+    classDef ok fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-### Client Resilience Features
-
-* **Async Token Acquisition Guard**: Gracefully handles millisecond auth initialization lags during client soft-refreshes by polling Clerk session readiness before firing network calls.
-* **Exponential Backoff Retries**: Automatically retries transient network dropouts, rate limit spikes (429), gateway timeouts (504), and connection aborts (`ECONNABORTED`).
-* **Robust Error Extraction**: Standardizes backend error messages into `error.extractedMessage` for clean UI toast notifications (`sonner` / `react-hot-toast`).
+    A["Client API Call (apiClient)"] ::: client --> B["1. Bearer Token Async Guard (Polls Clerk)"] ::: client
+    B --> C["2. Execute HTTP Request"] ::: client
+    
+    C -- "200 OK" --> D["Return Payload"] ::: ok
+    C -- "Transient Error (502, 503, 504, 429, Timeout)" --> E["3. Exponential Backoff Retry (Max 2 Retries, 1s Delay)"] ::: retry
+    
+    E -- "Retry Succeeds" --> D
+    E -- "Retries Exhausted" --> F["Extract Structured Error Message for UI Toast"] ::: retry
+```
 
 ---
 
@@ -595,24 +544,6 @@ sequenceDiagram
 }
 ```
 
-### Exception Mapping Matrix
-
-| Exception Trapped | HTTP Status Code | RFC 7807 Error Label | Purpose / Trigger Scenario |
-|---|---|---|---|
-| `ResourceNotFoundException` | `404 Not Found` | `Not Found` | Requested entity ID does not exist |
-| `AccessDeniedException` | `403 Forbidden` | `Forbidden` | Insufficient role permissions or campus access violation |
-| `IllegalArgumentException` | `400 Bad Request` | `Bad Request` | Malformed parameter or invalid DTO input |
-| `IllegalStateException` | `400 Bad Request` | `Business Rule Violation` | Business constraint breach (e.g. 24h cancellation window) |
-| `HttpMessageNotReadableException`| `400 Bad Request` | `Malformed JSON` | Malformed or unparseable JSON payload |
-| `DataIntegrityViolationException`| `409 Conflict` | `Data Conflict` | Database unique constraint violation |
-| `MethodArgumentNotValidException` | `400 Bad Request` | `Validation Failed` | Jakarta `@Valid` DTO field validation failure |
-| `ObjectOptimisticLockingFailureException` | `409 Conflict` | `Concurrency Conflict` | Optimistic locking race condition during simultaneous edits |
-| `Exception` (Generic Fallback) | `500 Server Error` | `Internal Server Error` | Unhandled error trapped safely without leaking stack traces |
-
-### Jackson ISO-8601 Temporal Standards (`JacksonConfig.java`)
-
-Configured with `JavaTimeModule` and `WRITE_DATES_AS_TIMESTAMPS = false` to guarantee that all dates/times across all REST endpoints are serialized in strict ISO-8601 format (e.g. `2026-08-09T02:16:03Z`) rather than raw numeric epoch timestamps.
-
 ---
 
 # PART IV: TELEMETRY, PERFORMANCE & BACKGROUND ENGINES
@@ -621,36 +552,18 @@ Configured with `JavaTimeModule` and `WRITE_DATES_AS_TIMESTAMPS = false` to guar
 
 Eruscent combines dedicated thread pools with automated background schedulers to guarantee high throughput and clean data maintenance.
 
-```
-                        ┌──────────────────────────────────────────┐
-                        │      SPRING @ENABLEASYNC THREAD POOLS    │
-                        └────────────────────┬─────────────────────┘
-                                             │
-                       ┌─────────────────────┴─────────────────────┐
-                       ▼                                           ▼
-          [ auditExecutor Thread Pool ]               [ taskExecutor Thread Pool ]
-          • Core Threads: 2                           • Core Threads: 5
-          • Max Threads: 5                            • Max Threads: 10
-          • Queue Capacity: 100                       • Queue Capacity: 500
-          • Isolates HMAC Audit Logging               • Handles Email Notifications
-```
+```mermaid
+flowchart TD
+    classDef pool fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef item fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
 
-### Automated Background Schedulers
+    Root["⚡ SPRING @ENABLEASYNC THREAD POOLS"] ::: pool
+    Root --> P1["auditExecutor Pool (2 Core / 5 Max / 100 Queue)"] ::: pool
+    Root --> P2["taskExecutor Pool (5 Core / 10 Max / 500 Queue)"] ::: pool
 
-1. **Nightly Database Maintenance (`DatabaseCleanupService`)**:
-   * Runs daily at 2:00 AM (`@Scheduled(cron = "0 0 2 * * *")`).
-   * **Slot Purging**: Deletes all past, unbooked `TimeSlot` entities.
-   * **1:1 Session Auto-Completion**: Transitions past confirmed 1-on-1 tutoring sessions to `COMPLETED` after a 24-hour grace period.
-   * **Group Session Auto-Completion**: Completes populated group classes 24 hours post-schedule.
-   * **Empty Group Cancellation**: Cancels unpopulated group sessions automatically.
-   * **Audit Log Retention Pruning**: Deletes audit logs older than 365 days.
-2. **Pending Session Auto-Expiry**:
-   * Runs every 15 minutes (`@Scheduled(cron = "0 0/15 * * * *")`).
-   * Auto-expires pending session requests that tutors failed to accept or reject before their scheduled start time.
-3. **Ghost-Town Low Attendance Watchdog (`GroupSessionScheduler`)**:
-   * Runs hourly (`@Scheduled(cron = "0 0 * * * *")`).
-   * Scans for group sessions starting in the next 12 hours with fewer than 3 enrolled students.
-   * Dispatches warning emails to tutors so they can decide whether to proceed or cancel.
+    P1 --> I1["• Isolates HMAC Audit Logging"] ::: item
+    P2 --> I2["• Handles Email Notifications & Webhooks"] ::: item
+```
 
 ---
 
@@ -658,21 +571,18 @@ Eruscent combines dedicated thread pools with automated background schedulers to
 
 To maintain ultra-low response latency across large multi-tenant institutional networks, Eruscent incorporates **Spring Cache Abstraction** (`@Cacheable` in `SuperAdminTelemetryService`):
 
-```
-Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)
-         │
-         ▼
-[ Check Spring Cache Region ('globalKpis' / 'globalHeatmap') ]
-         │
-         ├──► Cache Hit  ──► Return Cached Telemetry DTO (Zero DB Latency)
-         │
-         └──► Cache Miss ──► Execute Multi-Tenant SQL Aggregation Query
-                                   │
-                                   ▼
-                       [ Populate Cache & Return Telemetry Payload ]
-```
+```mermaid
+flowchart TD
+    classDef req fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef cache fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef hit fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-* **Cache Key Eviction**: Telemetry caches (`super_admin_kpis`, `super_admin_heatmap`) automatically invalidate upon major administrative operations or scheduled eviction cycles.
+    A["Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)"] ::: req --> B["Check Spring Cache Region ('globalKpis' / 'globalHeatmap')"] ::: cache
+    
+    B -- "Cache Hit" --> C["⚡ Return Cached Telemetry DTO (Zero DB Latency)"] ::: hit
+    B -- "Cache Miss" --> D["Execute Multi-Tenant SQL Aggregation Query"] ::: cache
+    D --> E["Populate Cache Region & Return Telemetry Payload"] ::: cache
+```
 
 ---
 
@@ -680,53 +590,23 @@ Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)
 
 Eruscent equips department heads and platform operators with real-time academic telemetry:
 
-```
-[ Department Session Logs ] ──► [ Query Aggregator ] ──► [ Department KPI Telemetry ]
-                                                               • 30-Day Completion Rate
-                                                               • Tutor Utilization Rate
-                                                               • Subject Bottleneck Radar
-```
+```mermaid
+flowchart LR
+    classDef src fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef res fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-### Telemetry Capabilities
-
-* **Subject Bottleneck Radar**: Identifies academic courses with high student booking demand but low tutor availability, allowing department admins to target tutor recruitment.
-* **Tutor Retention & Yield Analytics**: Calculates 7-day earnings yield, student retention percentages, and average daily yield per tutor profile.
-* **Indexed Profile View Telemetry (`ProfileView.java`)**: Utilizes composite database indexing (`idx_view_tutor_date`, `idx_view_viewer`) to record student views, tracking conversion rates from profile views to 1:1 session bookings.
-* **Super Admin System Heatmaps**: Platform-wide telemetry visualizing active session density and campus registration trends across institutions.
+    A["Department Session Logs"] ::: src --> B["Query Aggregator"] ::: src --> C["Department KPI Telemetry"] ::: res
+```
 
 ---
 
 ## 🪵 19. Production Structured Telemetry & Observability Pipeline
 
-Eruscent emits security and operational telemetry via SLF4J (`SecurityConfig.java`), which formats clean log streams for production log aggregation (e.g. Datadog, CloudWatch, ELK):
+Eruscent emits security and operational telemetry via SLF4J (`SecurityConfig.java`), which formats clean log streams for production log aggregation:
 
 ```log
 2026-08-08T23:15:50.123+08:00 DEBUG 14208 --- [backend] [http-nio-8080-exec-1] c.s.backend.config.SecurityConfig       : >>> SECURITY TELEMETRY: ClerkId=user_2tX9kL...7mP, UserFound=true, ResolvedRoles=[ROLE_STUDENT, ROLE_TUTOR], MappedAuthorities=[ROLE_STUDENT, ROLE_TUTOR]
 ```
-
-When parsed by log collectors into structured JSON telemetry:
-
-```json
-{
-  "timestamp": "2026-08-08T23:15:50.123Z",
-  "level": "DEBUG",
-  "logger": "com.strive.backend.config.SecurityConfig",
-  "thread": "http-nio-8080-exec-1",
-  "message": ">>> SECURITY TELEMETRY",
-  "context": {
-    "clerkId": "user_2tX9kL...7mP",
-    "userFound": true,
-    "resolvedRoles": ["ROLE_STUDENT", "ROLE_TUTOR"],
-    "mappedAuthorities": ["ROLE_STUDENT", "ROLE_TUTOR"]
-  }
-}
-```
-
-### Observability Features
-
-* **Health Probes**: Spring Boot Actuator health and readiness endpoints exposed at `/actuator/health` (configured with `show-details=when-authorized`).
-* **SLF4J Telemetry Logging**: Debug-level JWT security telemetry tracking Clerk user lookup, JIT sync state, and mapped granted authorities.
-* **Department KPI Historical Snapshots**: 30-day historical analytics tracking session completion rates, student retention, and departmental subject bottlenecks.
 
 ---
 
@@ -736,21 +616,21 @@ When parsed by log collectors into structured JSON telemetry:
 
 Eruscent uses an automated, containerized **GitHub Actions** CI/CD testing and vulnerability auditing pipeline (`.github/workflows/`):
 
-```
-Pull Request / Push to Main Branch
-         │
-         ├─────────────────────────────────────────┐
-         ▼                                         ▼
-[ Java CI Workflow (ci.yml) ]            [ Security Audit Workflow (security-audit.yml) ]
-• Spins up PostgreSQL 16 Service Container • Runs npm audit --audit-level=high (Frontend)
-• Health Probes (pg_isready)               • Runs mvn clean verify (Backend)
-• Compiles Java 21 & Runs Unit Tests       • Scheduled Weekly Midnight Audits (Cron: 0 0 * * 0)
-```
+```mermaid
+flowchart TD
+    classDef trigger fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#fff;
+    classDef job fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
 
-### DevOps Features
+    A["Pull Request / Push to Main Branch"] ::: trigger --> B["Java CI Workflow (ci.yml)"] ::: job
+    A --> C["Security Audit Workflow (security-audit.yml)"] ::: job
 
-* **Live Containerized Integration Testing**: The CI workflow (`ci.yml`) spins up a real, ephemeral `postgres:16` container service inside GitHub Actions with automated health checks (`pg_isready`), verifying schema compilation and database queries against a live database instance before merging code.
-* **Automated Weekly Security Audits**: The security workflow (`security-audit.yml`) runs on PRs, pushes, and **weekly scheduled crons** (every Sunday at midnight), auditing Node.js dependencies (`npm audit`) and Java Maven artifacts for newly discovered CVE vulnerabilities.
+    B --> B1["• Spins up PostgreSQL 16 Service Container (pg_isready)"] ::: job
+    B --> B2["• Compiles Java 21 & Runs Unit Tests"] ::: job
+
+    C --> C1["• Runs npm audit --audit-level=high (Frontend)"] ::: job
+    C --> C2["• Runs mvn clean verify (Backend)"] ::: job
+    C --> C3["• Scheduled Weekly Midnight Audits (Cron: 0 0 * * 0)"] ::: job
+```
 
 ---
 
@@ -758,21 +638,21 @@ Pull Request / Push to Main Branch
 
 Eruscent complies with cloud-native 12-Factor Application principles through dynamic Spring profile tiering (`application.properties` vs `application-prod.properties`):
 
-```
-                        ┌──────────────────────────────────────────┐
-                        │      SPRING ENVIRONMENT TIER SELECTION   │
-                        └────────────────────┬─────────────────────┘
-                                             │
-                       ┌─────────────────────┴─────────────────────┐
-                       ▼                                           ▼
-          [ Development Profile (Local) ]             [ Production Profile (Railway/Cloud) ]
-          • Local PostgreSQL (strive_db)              • Managed Cloud Postgres with SSL
-          • Mailtrap SMTP Sandbox                     • Enterprise SMTP Notification Gateway
-          • Verbose Local Logging                     • Production JSON Telemetry & Metrics
-```
+```mermaid
+flowchart TD
+    classDef root fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#fff;
+    classDef dev fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff;
+    classDef prod fill:#064e3b,stroke:#34d399,stroke-width:2px,color:#fff;
 
-* **Zero Hardcoded Credentials**: Database connection strings, JWT secrets, Clerk URIs, and email settings are injected purely via environment variables.
-* **Dynamic Property Overrides**: Production profiles override local defaults cleanly without code modifications.
+    Root["SPRING ENVIRONMENT TIER SELECTION"] ::: root --> D["Development Profile (Local)"] ::: dev
+    Root --> P["Production Profile (Railway / Cloud)"] ::: prod
+
+    D --> D1["• Local PostgreSQL (strive_db)"] ::: dev
+    D --> D2["• Mailtrap SMTP Sandbox"] ::: dev
+
+    P --> P1["• Managed Cloud Postgres with SSL"] ::: prod
+    P --> P2["• Enterprise SMTP Notification Gateway"] ::: prod
+```
 
 ---
 
@@ -780,22 +660,12 @@ Eruscent complies with cloud-native 12-Factor Application principles through dyn
 
 Database structure, migrations, and development seeders are managed via **Flyway** and Spring Boot initialization beans:
 
-```
-       ┌─────────────────────────────────────────────────────────────┐
-       │              FLYWAY DATABASE MIGRATION ENGINE               │
-       └──────────────────────────────┬──────────────────────────────┘
-                                      │
-       ┌──────────────────────────────┼──────────────────────────────┐
-       ▼                              ▼                              ▼
- [ V1__init_schema.sql ]  [ V2__add_group_sessions.sql ]  [ V3__add_user_roles.sql ]
- • Core Entities          • Group Lobbies & Enrollments   • Role Enums & Audit Signatures
- • Foreign Keys & Indexes • Capacity Constraints          • Domain Allowlist Table
-```
+```mermaid
+flowchart LR
+    classDef flyway fill:#881337,stroke:#f43f5e,stroke-width:2px,color:#fff;
 
-### Database Management Features
-
-* **Version-Controlled Schema**: Database DDL modifications are tracked as immutable SQL migration files in `src/main/resources/db/migration/`.
-* **Automated Data Seeder (`DatabaseSeeder.java`)**: Automatically seeds baseline administrative roles, sample institutional campuses, departments, active subjects, verified tutors, and initial domain allowlists for zero-friction developer onboarding and automated CI/CD staging environments.
+    V1["V1__init_schema.sql<br/>• Core Entities & Indexes"] ::: flyway --> V2["V2__add_group_sessions.sql<br/>• Group Lobbies & Capacity"] ::: flyway --> V3["V3__add_user_roles.sql<br/>• Role Enums & Audit Signatures"] ::: flyway
+```
 
 ---
 
@@ -803,20 +673,14 @@ Database structure, migrations, and development seeders are managed via **Flyway
 
 Eruscent automatically compiles its backend route contracts into an interactive **OpenAPI 3.0** documentation suite powered by `springdoc-openapi-starter-webmvc-ui`:
 
-```
-Spring Boot REST Controllers
-         │
-         ▼
-[ springdoc-openapi Annotation & Reflection Engine ]
-         │
-         ├──► Interactive Swagger UI (/swagger-ui.html)
-         └──► OpenAPI 3.0 JSON Contract (raw-openapi.json)
-```
+```mermaid
+flowchart TD
+    classDef doc fill:#1e1b4b,stroke:#85ea2d,stroke-width:2px,color:#fff;
 
-### OpenAPI Documentation Features
-
-* **Interactive API Testing**: Exposes a self-documenting interface at `/swagger-ui.html` for testing REST endpoints.
-* **Bearer JWT Security Scheme**: Configured with global Bearer JWT security components in `SwaggerConfig.java`, allowing developers to authenticate and execute requests directly within the UI.
+    A["Spring Boot REST Controllers"] ::: doc --> B["springdoc-openapi Annotation & Reflection Engine"] ::: doc
+    B --> C["Interactive Swagger UI (/swagger-ui.html)"] ::: doc
+    B --> D["OpenAPI 3.0 JSON Contract (raw-openapi.json)"] ::: doc
+```
 
 ---
 
