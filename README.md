@@ -12,9 +12,10 @@ Designed & Engineered by **Eruscent**
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Flyway Migrations](https://img.shields.io/badge/Flyway-PostgreSQL_v16-CC0200?style=for-the-badge&logo=flyway&logoColor=white)](https://flywaydb.org/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, and an OWASP-hardened security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, and an OWASP-hardened security architecture.
 
 **[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
@@ -57,9 +58,11 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 2. **Decoupled Identity & JIT Provisioning**: Authentication is offloaded to a stateless JWT/JWKS identity provider (Clerk) with Just-In-Time (JIT) user auto-provisioning and self-healing identity synchronization.
 3. **Dynamic Institutional Domain Gating**: Registration is restricted in real time via a Super-Admin-managed, 3-tier domain allowlist engine (`EmailDomainService`).
 4. **Dual Session & Conflict Engine**: Supports 1-on-1 bookings and multi-student group lobbies with real-time schedule conflict prevention and capacity locks.
-5. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
-6. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
-7. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
+5. **Optimistic Concurrency Control**: JPA optimistic locking (`ObjectOptimisticLockingFailureException`) prevents race conditions during high-volume simultaneous bookings.
+6. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
+7. **Resilient Client Interceptor**: Next.js client-side Axios layer featuring automatic exponential backoff retries for transient HTTP errors (502-504, 429, timeouts).
+8. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
+9. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
 
 ---
 
@@ -67,12 +70,12 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer ["Client & Edge Layer (Next.js 16 App Router)"]
+    subgraph ClientLayer ["Client Layer (Next.js 16 App Router)"]
         UI_Student["🎓 Student Marketplace & Dashboard"]
         UI_Tutor["🧑‍🏫 Tutor Management & Analytics"]
         UI_Admin["🛡️ Department Admin Portal"]
         UI_Super["👑 Super Admin Telemetry HUD"]
-        Edge_CORS["🌐 Edge Gateway / CORS Security Guard"]
+        Axios_Client["⚡ Resilient Axios Client (Retry Interceptor)"]
     end
 
     subgraph AuthLayer ["Identity & JWKS Provider"]
@@ -95,6 +98,11 @@ flowchart TB
             Ctrl_Webhook["Svix Webhook Listener"]
         end
 
+        subgraph ExceptionLayer ["Enterprise Error & Concurrency Guard"]
+            Global_Handler["📐 GlobalExceptionHandler (RFC 7807 Error Contract)"]
+            Opt_Locking["⚡ JPA Optimistic Locking Guard"]
+        end
+
         subgraph Engines ["Core Business Engines"]
             Conflict_Engine["📅 Overlap Conflict Resolver"]
             Streak_Engine["🔥 Timezone-Aware Streak Engine"]
@@ -109,13 +117,13 @@ flowchart TB
     end
 
     subgraph DataLayer ["Persistence & External Services"]
-        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Versioned Migrations)")]
+        DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
         Media_Cloudinary["☁️ Cloudinary Asset CDN"]
         Mail_Provider["📨 SMTP / JavaMailSender (Mailtrap / Production Provider)"]
     end
 
-    ClientLayer -->|HTTPS / Bearer JWT| Edge_CORS
-    Edge_CORS --> Rate_Limiter
+    ClientLayer --> Axios_Client
+    Axios_Client -->|HTTPS / Bearer JWT| Rate_Limiter
     Rate_Limiter --> Sec_Filter
     Sec_Filter --> Jwt_Decoder
     Jwt_Decoder -.->|Stateless Public Key Fetch| JWKS_Uri
@@ -123,7 +131,8 @@ flowchart TB
     JIT_Engine --> Domain_Guard
     Domain_Guard --> Controllers
 
-    Controllers --> Engines
+    Controllers --> ExceptionLayer
+    ExceptionLayer --> Engines
     Engines -->|Spring Data JPA| DB_Postgres
     Controllers -->|Async Events| BackgroundWorkers
     Audit_Pool -->|Persist HMAC Signed Logs| DB_Postgres
@@ -225,7 +234,32 @@ Eruscent implements two distinct tutoring session modes with real-time schedule 
 
 ---
 
-## 🔥 6. Timezone-Aware Gamification & Activity Streak Engine
+## ⚡ 6. Concurrency Safety & Optimistic Locking Guard
+
+During high-demand registration windows or popular group lobby launches, Eruscent prevents database race conditions using **JPA Optimistic Locking** (`ObjectOptimisticLockingFailureException`):
+
+```
+         Student A (Enrolls in Lobby) ───┐
+                                          ├──► Simultaneous Database Mutation Attempt
+         Student B (Enrolls in Lobby) ───┘
+                                          │
+                                          ▼
+                         [ JPA Optimistic Locking Check ]
+                                          │
+                         ├── First Transaction Succeeds (Version Updated)
+                         └── Second Transaction Fails (OptimisticLockingFailureException)
+                                          │
+                                          ▼
+                         [ GlobalExceptionHandler Trap ]
+                         Returns HTTP 409 Conflict: "Record modified. Please refresh."
+```
+
+* **Zero Lock Overhead**: Avoids heavy pessimistic database row locks, allowing read operations to run unhindered while safeguarding state modifications.
+* **Friendly Graceful Fallbacks**: Trapped by `GlobalExceptionHandler` to output a structured HTTP 409 Conflict response without corrupting session capacity counts.
+
+---
+
+## 🔥 7. Timezone-Aware Gamification & Activity Streak Engine
 
 To encourage consistent peer learning, Eruscent tracks daily activity streaks for both students and tutors (`updateStreak` in `GroupSessionService` & `TutoringSessionService`).
 
@@ -253,7 +287,7 @@ Session Completed Event
 
 ---
 
-## ⚡ 7. High-Concurrency Asynchronous & Scheduled Engine
+## ⚙️ 8. High-Concurrency Asynchronous & Scheduled Engine
 
 Eruscent combines dedicated thread pools with automated background schedulers to guarantee high throughput and clean data maintenance.
 
@@ -290,7 +324,7 @@ Eruscent combines dedicated thread pools with automated background schedulers to
 
 ---
 
-## 🔒 8. OWASP-Hardened Security & Cryptographic Audit Pipeline
+## 🔒 9. OWASP-Hardened Security & Cryptographic Audit Pipeline
 
 Eruscent was subjected to a comprehensive security engineering audit, implementing multi-layered controls against OWASP Top 10 vulnerabilities.
 
@@ -336,7 +370,68 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 
 ---
 
-## 🎯 9. Feature Capability & System Architecture Mapping
+## 🔄 10. Resilient Client Interceptor & Automatic Retry Engine
+
+The Next.js frontend client (`apiClient.ts`) is fortified with an intelligent HTTP resilience pipeline built on Axios:
+
+```
+Client API Call (apiClient)
+         │
+         ▼
+[ 1. Bearer Token Async Guard (Polls Clerk readiness) ]
+         │
+         ▼
+[ 2. HTTP Request Execution ]
+         │
+         ├──► Success (200 OK) ──► Return Payload
+         │
+         └──► Request Fails (Transient Error: 502, 503, 504, 429, Timeout)
+                     │
+                     ▼
+        [ 3. Exponential Backoff Retry (Max 2 Retries, 1s Delay) ]
+                     │
+                     ├── Retry Succeeds ──► Resolve Request
+                     └── Retries Exhausted ──► Extract Structured Error Message
+```
+
+### Client Resilience Features
+
+* **Async Token Acquisition Guard**: Gracefully handles millisecond auth initialization lags during client soft-refreshes by polling Clerk session readiness before firing network calls.
+* **Exponential Backoff Retries**: Automatically retries transient network dropouts, rate limit spikes (429), gateway timeouts (504), and connection aborts (`ECONNABORTED`).
+* **Robust Error Extraction**: Standardizes backend error messages into `error.extractedMessage` for clean UI toast notifications (`sonner` / `react-hot-toast`).
+
+---
+
+## 📐 11. Uniform Enterprise Exception & Error Contract
+
+Eruscent enforces a unified, RFC 7807 compliant error contract managed by `GlobalExceptionHandler` (`@RestControllerAdvice`):
+
+```json
+{
+  "status": 409,
+  "error": "Business Rule Violation",
+  "message": "Schedule conflict! You already have another session during this time.",
+  "timestamp": "2026-08-09T00:58:45.123Z"
+}
+```
+
+### Exception Mapping Matrix
+
+| Exception Trapped | HTTP Status Code | RFC 7807 Error Label | Purpose / Trigger Scenario |
+|---|---|---|---|
+| `ResourceNotFoundException` | `404 Not Found` | `Not Found` | Requested entity ID does not exist |
+| `AccessDeniedException` | `403 Forbidden` | `Forbidden` | Insufficient role permissions or campus access violation |
+| `IllegalArgumentException` | `400 Bad Request` | `Bad Request` | Malformed parameter or invalid DTO input |
+| `IllegalStateException` | `400 Bad Request` | `Business Rule Violation` | Business constraint breach (e.g. 24h cancellation window) |
+| `HttpMessageNotReadableException`| `400 Bad Request` | `Malformed JSON` | Malformed or unparseable JSON payload |
+| `DataIntegrityViolationException`| `409 Conflict` | `Data Conflict` | Database unique constraint violation |
+| `MethodArgumentNotValidException` | `400 Bad Request` | `Validation Failed` | Jakarta `@Valid` DTO field validation failure |
+| `ObjectOptimisticLockingFailureException` | `409 Conflict` | `Concurrency Conflict` | Optimistic locking race condition during simultaneous edits |
+| `Exception` (Generic Fallback) | `500 Server Error` | `Internal Server Error` | Unhandled error trapped safely without leaking stack traces |
+
+---
+
+## 🎯 12. Feature Capability & System Architecture Mapping
 
 | Feature Capability | Functional Description | Architecture Component | Primary Security & Operational Control |
 |---|---|---|---|
@@ -344,6 +439,7 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 | **Tutor Marketplace** | Searchable directory by subject, campus, hourly rate, and rating | `TutorProfileController` & JPA Specifications | Public GET cache, active profile filtering |
 | **1:1 Session Engine** | Real-time booking calendar, time slot locks, session state machine | `TutoringSessionService` | IDOR owner isolation, pending auto-expiry |
 | **Group Session Lobbies**| Multi-student group sessions, capacity bounds, automated enrollment | `GroupSessionService` & `Enrollment` | Capacity checks, hourly low-attendance watchdog |
+| **Concurrency Guard** | Prevents double-booking during concurrent seat claims | JPA Optimistic Locking | `@Version` fields, HTTP 409 Conflict handling |
 | **Tutor Analytics** | 7-day earnings yield, retention rate, daily yield analytics | `TutorAnalyticsController` | Custom SQL DTO projections, read-only isolation |
 | **Gamification Engine** | Timezone-aware streak tracking for active students and tutors | `GroupSessionService` & `UserService` | User timezone validation, streak boundary math |
 | **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
@@ -352,7 +448,7 @@ Eruscent was subjected to a comprehensive security engineering audit, implementi
 
 ---
 
-## 📊 10. Entity-Relationship & Data Model Overview
+## 📊 13. Entity-Relationship & Data Model Overview
 
 ```mermaid
 erDiagram
@@ -432,7 +528,30 @@ erDiagram
 
 ---
 
-## 🛡️ 11. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
+## 🐘 14. Versioned Schema Evolution & Automated Migrations
+
+Database structure and schema migrations are managed via **Flyway** (`org.flywaydb:flyway-database-postgresql`):
+
+```
+       ┌─────────────────────────────────────────────────────────────┐
+       │              FLYWAY DATABASE MIGRATION ENGINE               │
+       └──────────────────────────────┬──────────────────────────────┘
+                                      │
+       ┌──────────────────────────────┼──────────────────────────────┐
+       ▼                              ▼                              ▼
+ [ V1__init_schema.sql ]  [ V2__add_group_sessions.sql ]  [ V3__add_user_roles.sql ]
+ • Core Entities          • Group Lobbies & Enrollments   • Role Enums & Audit Signatures
+ • Foreign Keys & Indexes • Capacity Constraints          • Domain Allowlist Table
+```
+
+### Database Management Features
+
+* **Version-Controlled Schema**: Database DDL modifications are tracked as immutable SQL migration files in `src/main/resources/db/migration/`.
+* **Automated Bootstrapping**: `DatabaseSeeder.java` seeds baseline administrative roles, sample institutional campuses, and initial domain allowlists during development and staging setup.
+
+---
+
+## 🛡️ 15. Rate Limiting & Denial-of-Service (DoS) Protection Matrix
 
 Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 
@@ -449,7 +568,7 @@ To prevent IP spoofing attacks via client-supplied headers, `RateLimitIntercepto
 
 ---
 
-## 🪵 12. Production Structured Telemetry & Observability Pipeline
+## 🪵 16. Production Structured Telemetry & Observability Pipeline
 
 Eruscent emits security and operational telemetry via SLF4J (`SecurityConfig.java`), which formats clean log streams for production log aggregation (e.g. Datadog, CloudWatch, ELK):
 
@@ -483,7 +602,7 @@ When parsed by log collectors into structured JSON telemetry:
 
 ---
 
-## 📈 13. Institutional Analytics & Departmental Bottleneck Telemetry
+## 📈 17. Institutional Analytics & Departmental Bottleneck Telemetry
 
 Eruscent equips department heads and platform operators with real-time academic telemetry:
 
@@ -502,7 +621,7 @@ Eruscent equips department heads and platform operators with real-time academic 
 
 ---
 
-## 📱 14. Responsive Frontend & Mobile Layout Architecture
+## 📱 18. Responsive Frontend & Mobile Layout Architecture
 
 The frontend client layer is built with a modern, high-performance web architecture:
 
@@ -513,7 +632,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🛠️ 15. Technology Stack Breakdown
+## 🛠️ 19. Technology Stack Breakdown
 
 | Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
@@ -535,7 +654,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🗺️ 16. High-Level API Domain Map
+## 🗺️ 20. High-Level API Domain Map
 
 All API endpoints are exposed under the `/api/v1` namespace:
 
@@ -555,7 +674,7 @@ All API endpoints are exposed under the `/api/v1` namespace:
 
 ---
 
-## 💡 17. Architecture Strategy: Public Spec & Private Implementation
+## 💡 21. Architecture Strategy: Public Spec & Private Implementation
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
