@@ -16,7 +16,7 @@ Designed & Engineered by **Eruscent**
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapi-initiative&logoColor=black)](https://swagger.io/)
 [![OWASP Hardened](https://img.shields.io/badge/OWASP-Hardened_Top_10-green?style=for-the-badge&logo=shield)](https://owasp.org/)
 
-A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, dynamic JPA Criteria specifications, zero-trust peer messaging, verified review aggregation, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, and an OWASP-hardened security architecture.
+A production-grade, multi-tenant B2B SaaS platform connecting university students with peer tutors. Engineered with strict data isolation, dual session modes (1:1 & Group Lobbies), real-time academic telemetry, dynamic JPA Criteria specifications, zero-trust peer messaging, verified review aggregation, in-memory query caching, optimistic concurrency locking, automated background maintenance, timezone-aware gamification streaks, tamper-evident audit pipelines, resilient client retry interceptors, interactive OpenAPI docs, and an OWASP-hardened security architecture.
 
 **[🚀 Live Platform Demo](https://strive-chi-nine.vercel.app/)**
 
@@ -62,11 +62,12 @@ A production-grade, multi-tenant B2B SaaS platform connecting university student
 5. **Dynamic JPA Specification Search**: Multi-field search across tutor names, bios, and course codes using Spring Data JPA Criteria API with distinct deduplication.
 6. **Zero-Trust Peer Chat Radar**: In-session chat access control (`validateUserAccess`) with dynamic enrollment revocation and batch notification queries.
 7. **Verified Review Aggregation**: Rating engine permitting reviews strictly for completed sessions, preventing self-reviews, and auto-calculating rounded average ratings.
-8. **Optimistic Concurrency Control**: JPA optimistic locking (`ObjectOptimisticLockingFailureException`) prevents race conditions during high-volume simultaneous bookings.
-9. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
-10. **Resilient Client Interceptor**: Next.js client-side Axios layer featuring automatic exponential backoff retries for transient HTTP errors (502-504, 429, timeouts).
-11. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
-12. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
+8. **In-Memory Telemetry Caching**: Spring `@Cacheable` abstraction caching global KPIs and university heatmap node trees to eliminate DB load during high-traffic admin reloads.
+9. **Optimistic Concurrency Control**: JPA optimistic locking (`ObjectOptimisticLockingFailureException`) prevents race conditions during high-volume simultaneous bookings.
+10. **Timezone-Aware Gamification**: Automated activity streak calculation (`updateStreak`) maintaining student and tutor engagement across international timezones.
+11. **Resilient Client Interceptor**: Next.js client-side Axios layer featuring automatic exponential backoff retries for transient HTTP errors (502-504, 429, timeouts).
+12. **Automated Maintenance & Watchdogs**: Scheduled background workers automate session state transitions, expired time slot purges, audit log retention, and low-attendance alerts.
+13. **Tamper-Evident Security & Audit Pipeline**: Asynchronous audit logging backed by PII scrubbing, XSS/CRLF sanitization, and cryptographic HMAC-SHA256 digital signatures.
 
 ---
 
@@ -83,7 +84,7 @@ flowchart TB
     end
 
     subgraph AuthLayer ["Identity & JWKS Provider"]
-        Clerk_IdP["🔐 Clerk Identity Provider"]
+        Clerk_IdP["🔐 Clerk Identity Provider & Avatar CDN"]
         JWKS_Uri["🔑 Public JWKS Keys Endpoint"]
     end
 
@@ -93,6 +94,7 @@ flowchart TB
         Jwt_Decoder["jwtDecoder (NimbusJWKSet)"]
         JIT_Engine["🔄 JIT User Sync & Identity Healing"]
         Domain_Guard["🌐 EmailDomainService (3-Tier Gating)"]
+        Cache_Manager["🚀 Spring @Cacheable Layer"]
         
         subgraph Controllers ["REST API Domain Controllers"]
             Ctrl_Auth["Auth & Domain Gating"]
@@ -127,7 +129,6 @@ flowchart TB
 
     subgraph DataLayer ["Persistence & External Services"]
         DB_Postgres[("🐘 PostgreSQL 16 (Flyway Migrations)")]
-        Media_Cloudinary["☁️ Cloudinary Asset CDN"]
         Mail_Provider["📨 SMTP / JavaMailSender (Mailtrap / Production Provider)"]
     end
 
@@ -140,7 +141,8 @@ flowchart TB
     JIT_Engine --> Domain_Guard
     Domain_Guard --> Controllers
 
-    Controllers --> ExceptionLayer
+    Controllers --> Cache_Manager
+    Cache_Manager --> ExceptionLayer
     ExceptionLayer --> Engines
     Engines -->|Spring Data JPA| DB_Postgres
     Controllers -->|Async Events| BackgroundWorkers
@@ -148,7 +150,6 @@ flowchart TB
     Task_Pool -->|Send Transactional Emails| Mail_Provider
     Nightly_Cron -->|Purge & Auto-Complete| DB_Postgres
     Ghost_Watchdog -->|Low Attendance Alert| Mail_Provider
-    Controllers -->|Profile Image Uploads| Media_Cloudinary
     Clerk_IdP -->|Svix Signed Webhooks| Ctrl_Webhook
 ```
 
@@ -548,6 +549,10 @@ sequenceDiagram
 | `ObjectOptimisticLockingFailureException` | `409 Conflict` | `Concurrency Conflict` | Optimistic locking race condition during simultaneous edits |
 | `Exception` (Generic Fallback) | `500 Server Error` | `Internal Server Error` | Unhandled error trapped safely without leaking stack traces |
 
+### Jackson ISO-8601 Temporal Standards (`JacksonConfig.java`)
+
+Configured with `JavaTimeModule` and `WRITE_DATES_AS_TIMESTAMPS = false` to guarantee that all dates/times across all REST endpoints are serialized in strict ISO-8601 format (e.g. `2026-08-09T02:16:03Z`) rather than raw numeric epoch timestamps.
+
 ---
 
 ## 🎯 15. Feature Capability & System Architecture Mapping
@@ -564,10 +569,10 @@ sequenceDiagram
 | **Concurrency Guard** | Prevents double-booking during concurrent seat claims | JPA Optimistic Locking | `@Version` fields, HTTP 409 Conflict handling |
 | **Tutor Analytics** | 7-day earnings yield, retention rate, daily yield analytics | `TutorAnalyticsController` | Custom SQL DTO projections, read-only isolation |
 | **Gamification Engine** | Timezone-aware streak tracking for active students and tutors | `GroupSessionService` & `UserService` | User timezone validation, streak boundary math |
+| **In-Memory Caching** | Spring `@Cacheable` optimization for telemetry and heatmaps | `SuperAdminTelemetryService` | Cache key eviction, zero DB reload latency |
 | **Interactive API Docs**| Self-documenting Swagger UI & OpenAPI 3.0 specification | `springdoc-openapi` & `SwaggerConfig` | Bearer JWT security scheme definition |
 | **Department Admin Portal**| Tutor verification workflows, 30-day KPI snapshots, subject bottlenecks | `AdminController` | Department-scoped queries, `@PreAuthorize("hasRole('ADMIN')")` |
 | **Super Admin HUD** | Platform-wide telemetry, system anomalies, domain allowlist manager | `SuperAdminController` & `SuperAdminTelemetryController` | Platform RBAC, zero-downtime allowlist updates |
-| **Media Management** | Profile picture avatar uploads & CDN asset delivery | Cloudinary Service | Multipart size checks, rate-limited upload profile |
 
 ---
 
@@ -588,6 +593,7 @@ erDiagram
     TUTORING_SESSION ||--o| REVIEW : receives
     GROUP_SESSION ||--o| REVIEW : receives_group_review
     USER ||--o{ SESSION_MESSAGE : sends
+    USER ||--o{ PROFILE_VIEW : views_tutor_profile
     USER ||--o{ AUDIT_LOG : triggers
     UNIVERSITY ||--o{ ALLOWED_EMAIL_DOMAIN : enforces
 
@@ -634,6 +640,13 @@ erDiagram
         decimal locked_ticket_price
         boolean low_attendance_warning_sent
         enum status
+    }
+
+    PROFILE_VIEW {
+        uuid id PK
+        uuid viewer_id FK
+        uuid tutor_id FK
+        timestamp view_date
     }
 
     SESSION_MESSAGE {
@@ -723,7 +736,7 @@ Gateway rate limiting is managed by `RateLimitInterceptor` using **Bucket4j**:
 
 | Rate Limit Profile | URI Patterns / Protected Endpoints | Allowance Threshold | Bucket Refill Strategy | Action on Overflow |
 |---|---|---|---|---|
-| **Auth & Upload Profile** | `/api/v1/auth/**`, `/api/v1/users/login`, `/api/v1/users/register`, `/upload` | **5 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
+| **Auth Profile** | `/api/v1/auth/**`, `/api/v1/users/login`, `/api/v1/users/register` | **5 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
 | **Public Contact Profile** | `/api/v1/public/contact` | **2 requests / hour** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
 | **State Mutation Profile** | All state-modifying requests (`POST`, `PUT`, `DELETE`, `PATCH`) | **60 requests / minute** | Per-IP Token Bucket | HTTP 429 Too Many Requests |
 | **Read Bypass** | All `GET` and `OPTIONS` pre-flight requests | **Unlimited / Unthrottled** | Bypass Rule | Allowed |
@@ -783,11 +796,34 @@ Eruscent equips department heads and platform operators with real-time academic 
 
 * **Subject Bottleneck Radar**: Identifies academic courses with high student booking demand but low tutor availability, allowing department admins to target tutor recruitment.
 * **Tutor Retention & Yield Analytics**: Calculates 7-day earnings yield, student retention percentages, and average daily yield per tutor profile.
+* **Indexed Profile View Telemetry (`ProfileView.java`)**: Utilizes composite database indexing (`idx_view_tutor_date`, `idx_view_viewer`) to record student views, tracking conversion rates from profile views to 1:1 session bookings.
 * **Super Admin System Heatmaps**: Platform-wide telemetry visualizing active session density and campus registration trends across institutions.
 
 ---
 
-## 🏗️ 22. Environment Profile Isolation & Production Tiering
+## 🚀 22. In-Memory Telemetry & Treemap Caching Engine (`@Cacheable`)
+
+To maintain ultra-low response latency across large multi-tenant institutional networks, Eruscent incorporates **Spring Cache Abstraction** (`@Cacheable` in `SuperAdminTelemetryService`):
+
+```
+Super Admin Dashboard Request (getGlobalKpis / getGlobalHeatmap)
+         │
+         ▼
+[ Check Spring Cache Region ('globalKpis' / 'globalHeatmap') ]
+         │
+         ├──► Cache Hit  ──► Return Cached Telemetry DTO (Zero DB Latency)
+         │
+         └──► Cache Miss ──► Execute Multi-Tenant SQL Aggregation Query
+                                   │
+                                   ▼
+                       [ Populate Cache & Return Telemetry Payload ]
+```
+
+* **Cache Key Eviction**: Telemetry caches (`super_admin_kpis`, `super_admin_heatmap`) automatically invalidate upon major administrative operations or scheduled eviction cycles.
+
+---
+
+## 🏗️ 23. Environment Profile Isolation & Production Tiering
 
 Eruscent complies with cloud-native 12-Factor Application principles through dynamic Spring profile tiering (`application.properties` vs `application-prod.properties`):
 
@@ -804,12 +840,12 @@ Eruscent complies with cloud-native 12-Factor Application principles through dyn
           • Verbose Local Logging                     • Production JSON Telemetry & Metrics
 ```
 
-* **Zero Hardcoded Credentials**: Database connection strings, JWT secrets, Clerk URIs, and Cloudinary keys are injected purely via environment variables.
+* **Zero Hardcoded Credentials**: Database connection strings, JWT secrets, Clerk URIs, and email settings are injected purely via environment variables.
 * **Dynamic Property Overrides**: Production profiles override local defaults cleanly without code modifications.
 
 ---
 
-## 📱 23. Responsive Frontend & Mobile Layout Architecture
+## 📱 24. Responsive Frontend & Mobile Layout Architecture
 
 The frontend client layer is built with a modern, high-performance web architecture:
 
@@ -820,7 +856,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 ---
 
-## 🛠️ 24. Technology Stack Breakdown
+## 🛠️ 25. Technology Stack Breakdown
 
 | Layer | Technology | Version | Key Responsibilities |
 |---|---|---|---|
@@ -832,25 +868,24 @@ The frontend client layer is built with a modern, high-performance web architect
 | **Backend Core** | Spring Boot | `3.4.2` | Enterprise REST API engine |
 | **Runtime** | Java OpenJDK | `21` | High-performance backend execution |
 | **Security** | Spring Security | `3.4.2` | OAuth2 Resource Server & `@PreAuthorize` RBAC |
-| **Identity Provider** | Clerk | `@clerk/nextjs` | Authentication & token issuance |
+| **Identity Provider** | Clerk | `@clerk/nextjs` | Authentication, token issuance & avatar CDN |
 | **Webhook Verifier** | Svix | `1.90.0` | Cryptographic HMAC webhook verification |
 | **Rate Limiter** | Bucket4j | `8.10.1` | Per-IP token bucket rate limiting |
 | **API Documentation** | OpenAPI / Swagger UI | `2.8.5` | Interactive API documentation & OpenAPI schemas |
 | **Database** | PostgreSQL | `16` | Relational data persistence |
 | **Migrations** | Flyway | Built-in | Database versioning & automated migrations |
-| **Media CDN** | Cloudinary | API v2 | Profile avatar & media asset storage |
 | **Email Service** | JavaMailSender | Spring Starter | Asynchronous transactional notification mail |
 
 ---
 
-## 🗺️ 25. High-Level API Domain Map
+## 🗺️ 26. High-Level API Domain Map
 
 All API endpoints are exposed under the `/api/v1` namespace:
 
 | Group | Base Path | Required Access / Role | Rate Limit Profile | Purpose |
 |---|---|---|---|---|
 | **Auth** | `/api/v1/auth/**` | Public / Authenticated | Auth Profile (5 req/min) | Identity synchronization & session context |
-| **Users** | `/api/v1/users/**` | Authenticated / Self | Auth Profile (sensitive routes) | User profiles & avatar updates |
+| **Users** | `/api/v1/users/**` | Authenticated / Self | Auth Profile (sensitive routes) | User profiles & identity self-healing |
 | **Sessions (1:1)** | `/api/v1/sessions/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | 1-on-1 session booking state machine |
 | **Group Lobbies** | `/api/v1/lobbies/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | Group session creation & auto-enrollment |
 | **Messages (Chat)**| `/api/v1/messages/**` | `ROLE_STUDENT`, `ROLE_TUTOR` | Standard Profile (60 req/min) | Peer chat history & real-time notifications |
@@ -865,7 +900,7 @@ All API endpoints are exposed under the `/api/v1` namespace:
 
 ---
 
-## 💡 26. Architecture Strategy: Public Spec & Private Implementation
+## 💡 27. Architecture Strategy: Public Spec & Private Implementation
 
 Designed by **Eruscent**, this project adopts an **"Open Architecture Specification, Private Source Code Implementation"** repository model.
 
@@ -877,7 +912,7 @@ Designed by **Eruscent**, this project adopts an **"Open Architecture Specificat
        │  • OpenAPI 3.0 Route Contracts & Domain Mapping                 │
        │  • Entity-Relationship Diagrams (ERD)                           │
        │  • Security Audit Controls & Rate Limiting Matrices             │
-       └────────────────────────────────┬────────────────────────────────┘
+       └──────────────────────────────┬────────────────────────────────┘
                                         │
                                         ▼
        ┌─────────────────────────────────────────────────────────────────┐
