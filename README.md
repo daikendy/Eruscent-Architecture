@@ -4,7 +4,7 @@
 
 **Institutional Peer Tutoring, Academic Telemetry & Enterprise Multi-Tenant Platform**
 
-Designed & Engineered by **Kenneth (@Daikendy)**
+Designed & Engineered by **Kenneth [(@Daikendy)](https://github.com/daikendy)**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.1-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -942,7 +942,7 @@ The frontend client layer is built with a modern, high-performance web architect
 
 <div align="center">
 
-**Designed & Architected by Kenneth (@Daikendy)**  
+**Designed & Architected by Kenneth [(@Daikendy)](https://github.com/daikendy)**  
 *Building Secure, Scalable, and Modern Enterprise Systems.*
 
 </div>
